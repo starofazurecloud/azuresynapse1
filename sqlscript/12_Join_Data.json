@@ -1,0 +1,20 @@
+{
+	"name": "12_Join_Data",
+	"properties": {
+		"folder": {
+			"name": "1_NYC_Taxi/1_Discovery"
+		},
+		"content": {
+			"query": "USE nyc_taxi_discovery\nGO\n--------------------------------------------------\n-- Identify no of trips made from each borough\n--------------------------------------------------\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=2020/month=01/*.csv',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS [result]\n    WHERE PULocationID IS NULL\n\n\n\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n\n\n------------------------------------------\n-- Join\n------------------------------------------\nSELECT\n    taxi_zone_data.borough , COUNT(1) AS no_of_records\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'PARQUET'\n    ) AS trip_data\n\n    JOIN OPENROWSET(\n                    BULK 'abfss://nyc-taxi-data@azuresynapsecoursedl.dfs.core.windows.net/raw/taxi_zone.csv',\n                    FORMAT = 'CSV',\n                    PARSER_VERSION = '2.0',\n                    FIRSTROW = 2 ,\n                    FIELDTERMINATOR = ',',\n                    ROWTERMINATOR = '\\n'\n                )\n                WITH (loation_id SMALLINT 1,\n                borough VARCHAR(15)  2 ,\n                zone VARCHAR(50)  3 ,\n                service_zone VARCHAR(15) 4  \n                )AS taxi_zone_data \n    ON trip_data.PULocationID = taxi_zone_data.loation_id \n    GROUP BY taxi_zone_data.borough\n    ORDER BY  no_of_records ASC;\n\n\n\n\n\n\n\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_discovery",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

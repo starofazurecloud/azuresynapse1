@@ -1,0 +1,20 @@
+{
+	"name": "13_Simple_Transformation",
+	"properties": {
+		"folder": {
+			"name": "1_NYC_Taxi/1_Discovery"
+		},
+		"content": {
+			"query": "USE nyc_taxi_discovery\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
