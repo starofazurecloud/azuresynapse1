@@ -1,0 +1,20 @@
+{
+	"name": "8_Explore_Parquet_trip_data_green_parquet",
+	"properties": {
+		"folder": {
+			"name": "1_NYC_Taxi/1_Discovery"
+		},
+		"content": {
+			"query": "-- This is auto-generated code\n-- Connect to Built in Serverless SQL Pool\n-- Connect to nyc_taxi_discovery Database\n\nUSE nyc_taxi_discovery\nGO\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/part-00000-tid-6133789922049958496-2e489315-890a-4453-ae93-a104be9a6f06-106-1-c000.snappy.parquet',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n\n-- Reading Folder\n\nSELECT\n    TOP 100 * \nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n\n--Check DataType\nEXEC sp_describe_first_result_set N'SELECT\n    TOP 100 * \nFROM\n    OPENROWSET(\n        BULK ''trip_data_green_parquet/year=2020/month=01/'',\n        DATA_SOURCE = ''nyc_taxi_data_raw'',\n        FORMAT = ''PARQUET''\n    ) AS [result]'\n-------------------------------------------\n-- Define Columns and DataTypes\n-------------------------------------------\nSELECT\n    TOP 100 * \nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'PARQUET'\n    ) WITH(\n\n    VendorID\tint\n    ,lpep_pickup_datetime\tdatetime2(7)\n    ,lpep_dropoff_datetime\tdatetime2(7)\n    ,store_and_fwd_flag\tCHAR(1)\n    ,RatecodeID\tint\n    ,PULocationID\tint\n    ,DOLocationID\tint\n    ,passenger_count\tint\n    ,trip_distance\tfloat\n    ,fare_amount\tfloat\n    ,extra\tfloat\n    ,mta_tax\tfloat\n    ,tip_amount\tfloat\n    ,tolls_amount\tfloat\n    ,ehail_fee\tint\n    ,improvement_surcharge\tfloat\n    ,total_amount\tfloat\n    ,payment_type\tint\n    ,trip_type\tint\n    ,congestion_surcharge\tfloat\n    ) AS [result]\n-------------------------------------------\n-- Read Specific Columns\n-------------------------------------------\nSELECT\n    TOP 100 * \nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'PARQUET'\n    )WITH(    \n     tip_amount\tfloat    \n    ,trip_type\tint\n    ) AS [result]    \n\n\n\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_discovery",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
