@@ -1,0 +1,20 @@
+{
+	"name": "10_Check_For_Duplicates",
+	"properties": {
+		"folder": {
+			"name": "1_NYC_Taxi/1_Discovery"
+		},
+		"content": {
+			"query": "USE nyc_taxi_discovery\nGO\nSELECT\n    location_id , COUNT(1) AS number_of_records\nFROM\n    OPENROWSET(\n        BULK 'abfss://nyc-taxi-data@azuresynapsecoursedl.dfs.core.windows.net/raw/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        FIRSTROW = 2 ,\n        FIELDTERMINATOR = ',',\n        ROWTERMINATOR = '\\n'\n    )\n    WITH (location_id SMALLINT 1,\n    borough VARCHAR(15)  2 ,\n    zone VARCHAR(50)  3 ,\n    service_zone VARCHAR(15) 4  \n    )AS [result]\n    GROUP BY location_id\n    HAVING COUNT(1) > 1",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_discovery",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
