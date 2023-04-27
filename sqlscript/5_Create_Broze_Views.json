@@ -1,0 +1,20 @@
+{
+	"name": "5_Create_Broze_Views",
+	"properties": {
+		"folder": {
+			"name": "1_NYC_Taxi/2_ldw"
+		},
+		"content": {
+			"query": "USE nyc_taxi_ldw;\nGO\n\nIF OBJECT_ID('bronze.vw_rate_code') IS NOT NULL\n    DROP VIEW bronze.vw_rate_code\n\n--DROP VIEW IF EXISTS bronze.vw_rate_code\n\nGO \n\nCREATE VIEW bronze.vw_rate_code\nAS\nSELECT * \nFROM OPENROWSET(\nBULK 'raw/rate_code.json' ,\nDATA_SOURCE = 'nyc_taxi_src' ,\nFORMAT = 'CSV',\nPARSER_VERSION = '1.0',\nFIELDTERMINATOR = '0x0b', -- Vertical Tab\nFIELDQUOTE = '0x0b', -- Vertical Tab\nROWTERMINATOR = '0x0b'  -- Vertical Tab\n)WITH(  \n    jsonDoc NVARCHAR(MAX)\n) AS rate_code\nCROSS APPLY OPENJSON(jsonDoc)\nWITH(\n    rate_code_id SMALLINT,\n    rate_code_desc VARCHAR(20) '$.rate_code'\n);\n\nGO\nSELECT * FROM bronze.vw_rate_code\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_ldw",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
