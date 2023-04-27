@@ -1,11 +1,11 @@
 {
-	"name": "2_Create_External_Data_Source",
+	"name": "2_Create_External_Data_Sources",
 	"properties": {
 		"folder": {
 			"name": "1_NYC_Taxi/2_ldw"
 		},
 		"content": {
-			"query": "USE nyc_taxi_ldw;\nGO\n\nCREATE EXTERNAL DATA SOURCE nyc_taxi_src\nWITH\n(   LOCATION = 'abfss://nyc-taxi-data@azuresynapsecoursedl.dfs.core.windows.net/'\n);\n",
+			"query": "USE nyc_taxi_ldw;\nGO\n\nIF EXISTS (SELECT 1 FROM sys.external_data_sources WHERE name = 'nyc_taxi_src')\nDROP EXTERNAL DATA SOURCE nyc_taxi_src\nGO\nCREATE EXTERNAL DATA SOURCE nyc_taxi_src\nWITH\n(   LOCATION = 'abfss://nyc-taxi-data@azuresynapsecoursedl.dfs.core.windows.net/'\n);\n",
 			"metadata": {
 				"language": "sql"
 			},
