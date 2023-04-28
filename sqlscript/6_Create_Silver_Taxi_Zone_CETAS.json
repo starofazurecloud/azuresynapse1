@@ -1,0 +1,20 @@
+{
+	"name": "6_Create_Silver_Taxi_Zone_CETAS",
+	"properties": {
+		"folder": {
+			"name": "1_NYC_Taxi/2_ldw"
+		},
+		"content": {
+			"query": "USE nyc_taxi_ldw;\nGO\n\n------------------------------------------------------------\n-- External Table Name :  silver.taxi_zone using CETAS\n------------------------------------------------------------\n\nIF EXISTS (SELECT 1 FROM sys.external_tables WHERE name = 'taxi_zone')\n    DROP EXTERNAL TABLE silver.taxi_zone\nGO\n\nCREATE EXTERNAL TABLE silver.taxi_zone\nWITH(\n        DATA_SOURCE = nyc_taxi_src\n        ,LOCATION = 'silver/taxi_zone'\n        ,FILE_FORMAT = parquet_file_format,\n\n)\nAS\nSELECT *\nFROM bronze.taxi_zone\n\nGO\n\nSELECT *\nFROM silver.taxi_zone\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_ldw",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
