@@ -1,0 +1,20 @@
+{
+	"name": "1_usp_silver_trip_data_green",
+	"properties": {
+		"folder": {
+			"name": "1_NYC_Taxi/2_ldw/12_usp"
+		},
+		"content": {
+			"query": "USE nyc_taxi_ldw;\nGO\n\nCREATE OR ALTER PROCEDURE silver.usp_silver_trip_data_green\n@year VARCHAR(4),\n@month VARCHAR(2)\nAS\nBEGIN\n\n    DECLARE @create_sql_stmt NVARCHAR(MAX);\n    DECLARE @drop_sql_stmt NVARCHAR(MAX);\n    \n    SET @create_sql_stmt =\n        N'CREATE EXTERNAL TABLE silver.trip_data_green_'+@year+'_'+@month+'\n            WITH(\n                    DATA_SOURCE = nyc_taxi_src\n                    ,LOCATION = ''silver/trip_data_green/year='+@year + '/month='+@month+'''\n                    ,FILE_FORMAT = parquet_file_format,\n            )\n            AS\n            SELECT   [VendorID]\t AS vendor_id\n                    ,[lpep_pickup_datetime]\t\n                    ,[lpep_dropoff_datetime]\t\n                    ,[store_and_fwd_flag]\t\n                    ,[RatecodeID ] AS rate_code_id\t\n                    ,[PULocationID]  AS pu_location_id\t\t\n                    ,[DOLocationID]  AS do_location_id\t\t\n                    ,[passenger_count]\t\n                    ,[trip_distance]\n                    ,[fare_amount]\t\n                    ,[extra]\t\n                    ,[mta_tax]\t\n                    ,[tip_amount]\t\n                    ,[tolls_amount]\t\n                    ,[ehail_fee]\t\n                    ,[improvement_surcharge]\t\n                    ,[total_amount]\t\n                    ,[payment_type]\t\n                    ,[trip_type]\t\n                    ,[congestion_surcharge]\t\n            FROM bronze.vw_trip_data_green_csv\n            WHERE year ='''+@year +'''\n            AND month='''+@month+'''';\n\n    PRINT  @create_sql_stmt \n\n    EXEC (@create_sql_stmt)\n\n    SET @drop_sql_stmt = \n        N'DROP EXTERNAL TABLE silver.trip_data_green_'+@year+'_'+@month ;\n\n    EXEC (@drop_sql_stmt )\n    PRINT  @drop_sql_stmt \n\nEND\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_ldw",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
