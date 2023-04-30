@@ -1,0 +1,20 @@
+{
+	"name": "15_Create_Gold_Views",
+	"properties": {
+		"folder": {
+			"name": "1_NYC_Taxi/2_ldw"
+		},
+		"content": {
+			"query": "\nUSE nyc_taxi_ldw;\nGO\n\nDROP VIEW IF EXISTS gold.vw_trip_data_green\nGO\n\nCREATE VIEW gold.vw_trip_data_green\nAS\n    SELECT\n        \n        --result.filename() as file_name,\n        result.filepath(1) as year, -- 1 here is Position of WildCard  \n        result.filepath(2) as month, -- 2 here is Position of WildCard \n        result.filepath(3) as filename_from_file_path, -- 3 here is Position of WildCard \n        result.*\n    FROM\n        OPENROWSET(\n            BULK '/gold/trip_data_green/year=*/month=*/*.parquet' ,\n            DATA_SOURCE = 'nyc_taxi_src',\n            FORMAT = 'PARQUET'\n        )WITH(\n             borough VARCHAR(15),\n             trip_date DATE,\n             trip_day VARCHAR(15),\n             trip_day_weekend_ind CHAR(1),\n             card_trip_count INT,\n             cash_trip_count INT\n            ) AS [result] \n        \nGO\n\n\nSELECT  year,month,COUNT(1) AS record_count FROM gold.vw_trip_data_green\nGROUP BY year,month\nORDER BY 1,2\n\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_ldw",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
