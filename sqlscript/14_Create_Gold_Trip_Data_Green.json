@@ -1,0 +1,20 @@
+{
+	"name": "14_Create_Gold_Trip_Data_Green",
+	"properties": {
+		"folder": {
+			"name": "1_NYC_Taxi/2_ldw"
+		},
+		"content": {
+			"query": "USE nyc_taxi_ldw;\nGO\n\n/*\nSELECT \n        td.year\n       ,td.month\n       ,tz.borough\n       ,CONVERT(DATE,td.lpep_pickup_datetime) AS trip_date\n      ,cal.day_name \n      ,iif(cal.day_name IN ('Saturday','Sunday'),'Y','N') AS trip_day_weekend_ind\n      ,SUM(iif(pt.description = 'Credit card',1,0)) AS card_trip_count\n      ,SUM(iif(pt.description = 'Cash',1,0)) AS cash_trip_count\nFROM silver.vw_trip_data_green td\nINNER JOIN silver.taxi_zone tz ON (td.pu_location_id = tz.loation_id)\nINNER JOIN silver.calendar cal ON (cal.date = CONVERT(DATE,td.lpep_pickup_datetime))\nINNER JOIN silver.payment_type pt ON (td.payment_type = pt.payment_type)\n\nWHERE td.year = '2020'\n  AND td.month = '01'\n\nGROUP BY td.year\n        ,td.month\n        ,tz.borough\n        ,CONVERT(DATE,td.lpep_pickup_datetime) \n       ,cal.day_name \n\n*/\n\nEXEC gold.usp_gold_trip_data_green @year = '2020' , @month = '01'\nEXEC gold.usp_gold_trip_data_green @year = '2020' , @month = '02'\nEXEC gold.usp_gold_trip_data_green @year = '2020' , @month = '03'\nEXEC gold.usp_gold_trip_data_green @year = '2020' , @month = '04'\nEXEC gold.usp_gold_trip_data_green @year = '2020' , @month = '05'\nEXEC gold.usp_gold_trip_data_green @year = '2020' , @month = '06'\nEXEC gold.usp_gold_trip_data_green @year = '2020' , @month = '07'\nEXEC gold.usp_gold_trip_data_green @year = '2020' , @month = '08'\nEXEC gold.usp_gold_trip_data_green @year = '2020' , @month = '09'\nEXEC gold.usp_gold_trip_data_green @year = '2020' , @month = '10'\nEXEC gold.usp_gold_trip_data_green @year = '2020' , @month = '11'\nEXEC gold.usp_gold_trip_data_green @year = '2020' , @month = '12'\n\nEXEC gold.usp_gold_trip_data_green @year = '2021' , @month = '01'\nEXEC gold.usp_gold_trip_data_green @year = '2021' , @month = '02'\nEXEC gold.usp_gold_trip_data_green @year = '2021' , @month = '03'\nEXEC gold.usp_gold_trip_data_green @year = '2021' , @month = '04'\nEXEC gold.usp_gold_trip_data_green @year = '2021' , @month = '05'\nEXEC gold.usp_gold_trip_data_green @year = '2021' , @month = '06'\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_ldw",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
