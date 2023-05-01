@@ -1,15 +1,22 @@
 {
-	"name": "3_pl_create_silver_tables_usp",
+	"name": "3_pl_create_silver_tables_usp_array_from_file",
 	"properties": {
 		"activities": [
 			{
 				"name": "ForEach Folder Path",
 				"type": "ForEach",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Lookup_foler_path_usp_name_array",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@variables('v_folder_path_usp_name_array')",
+						"value": "@activity('Lookup_foler_path_usp_name_array').output.value",
 						"type": "Expression"
 					},
 					"isSequential": true,
@@ -77,44 +84,67 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "Lookup_foler_path_usp_name_array",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"dataset": {
+						"referenceName": "ds_foler_path_usp_name_array",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
 			}
 		],
 		"variables": {
-			"v_folder_path": {
-				"type": "String",
-				"defaultValue": "silver/taxi_zone"
-			},
-			"v_usp_name": {
-				"type": "String",
-				"defaultValue": "silver.usp_silver_taxi_zone"
-			},
 			"v_folder_path_usp_name_array": {
 				"type": "Array",
 				"defaultValue": [
-					{
-						"folder_path": "silver/calendar",
-						"usp_name": "silver.usp_silver_calendar"
-					},
-					{
-						"folder_path": "silver/taxi_zone",
-						"usp_name": "silver.usp_silver_taxi_zone"
-					},
-					{
-						"folder_path": "silver/trip_type",
-						"usp_name": "silver.usp_silver_trip_type"
-					},
-					{
-						"folder_path": "silver/vendor",
-						"usp_name": "silver.usp_silver_vendor"
-					},
-					{
-						"folder_path": "silver/rate_code",
-						"usp_name": "silver.usp_silver_rate_code"
-					},
-					{
-						"folder_path": "silver/payment_type",
-						"usp_name": "silver.usp_silver_payment_type"
-					}
+					[
+						"silver/calendar",
+						"silver.usp_silver_calendar"
+					],
+					[
+						"silver/taxi_zone",
+						"silver.usp_silver_taxi_zone"
+					],
+					[
+						"silver/trip_type",
+						"silver.usp_silver_trip_type"
+					],
+					[
+						"silver/vendor",
+						"silver.usp_silver_vendor"
+					],
+					[
+						"silver/rate_code",
+						"silver.usp_silver_rate_code"
+					],
+					[
+						"silver/payment_type",
+						"silver.usp_silver_payment_type"
+					]
 				]
 			}
 		},
