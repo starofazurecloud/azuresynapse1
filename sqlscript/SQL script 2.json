@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 2",
+	"properties": {
+		"content": {
+			"query": "SELECT TOP (100) [year]\n,[month]\n,[filename_from_file_path]\n,[vendor_id]\n,[lpep_pickup_datetime]\n,[lpep_dropoff_datetime]\n,[improvement_surcharge]\n,[total_amount]\n,[payment_type]\n,[trip_type]\n,[congestion_surcharge]\n,[fare_amount]\n,[extra]\n,[mta_tax]\n,[tip_amount]\n,[tolls_amount]\n,[ehail_fee]\n,[store_and_fwd_flag]\n,[rate_code_id]\n,[pu_location_id]\n,[do_location_id]\n,[passenger_count]\n,[trip_distance]\n FROM [silver].[vw_trip_data_green]",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_ldw",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
