@@ -72,6 +72,9 @@
 			"v_usp_name": {
 				"type": "String",
 				"defaultValue": "silver.usp_silver_taxi_zone"
+			},
+			"v_folder_path_usp_name_array": {
+				"type": "Array"
 			}
 		},
 		"annotations": []
