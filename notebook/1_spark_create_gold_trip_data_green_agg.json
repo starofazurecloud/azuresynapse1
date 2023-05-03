@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "04fdd100-1e2a-434f-be09-601dc6f4c628"
+				"spark.autotune.trackingId": "8c8db068-2994-4723-910e-d590376fcefa"
 			}
 		},
 		"metadata": {
@@ -161,7 +161,7 @@
 					"# Read the silver data to be processed. \n",
 					"trip_data_green_df = spark.read.parquet(f\"{silver_folder_path}/trip_data_green\") "
 				],
-				"execution_count": 4
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -187,7 +187,7 @@
 					"                        .agg(count(lit(1)).alias(\"total_trip_count\"),\n",
 					"                        round(sum(\"fare_amount\"), 2).alias(\"total_fare_amount\"))"
 				],
-				"execution_count": 5
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -207,7 +207,7 @@
 					"\n",
 					"trip_data_green_agg_df.write.mode(\"overwrite\").partitionBy(\"year\", \"month\").format(\"parquet\").saveAsTable(\"nyc_taxi_ldw_spark.trip_data_green_agg\")"
 				],
-				"execution_count": 6
+				"execution_count": 10
 			}
 		]
 	}
