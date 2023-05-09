@@ -1,0 +1,20 @@
+{
+	"name": "1_synapse_link_query_heartbit_cosmosdb",
+	"properties": {
+		"folder": {
+			"name": "1_NYC_Taxi/synapselink-cosmosdb"
+		},
+		"content": {
+			"query": "IF (NOT EXISTS(SELECT * FROM sys.credentials WHERE name = 'azure-synapse-course-cosmos-db'))\n    \n    CREATE CREDENTIAL [azure-synapse-course-cosmos-db]\n    WITH IDENTITY = 'SHARED ACCESS SIGNATURE', SECRET = 'W2xnebxGYicO6JwMHO7Do7Qj7mPDqA8cJsdgU1oMbLe1xiZ4xesn1ifwpA5yR60TmeNLG3bzwyEQACDbVgkmKQ=='\nGO\n\n-- Serverless SQL ONLY Pulls the data from Synapse Analytical Store\n\nSELECT TOP 100 *\nFROM OPENROWSET(​PROVIDER = 'CosmosDB',\n                CONNECTION = 'Account=azure-synapse-course-cosmos-db;Database=nyctaxidb',\n                OBJECT = 'Heartbeat',\n                SERVER_CREDENTIAL = 'azure-synapse-course-cosmos-db'\n) AS [Heartbeat]\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
