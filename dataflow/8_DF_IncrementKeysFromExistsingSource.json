@@ -1,0 +1,134 @@
+{
+	"name": "8_DF_IncrementKeysFromExistsingSource",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "EmpSourceWithKey",
+					"description": "Emp File with EMPID "
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "EMPSourceWithoutKey",
+					"description": "Connect to EmployeeWithNoKey.txt"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "WriteToFile",
+					"description": "Write to Output/IncrementKeyEmpoyees"
+				}
+			],
+			"transformations": [
+				{
+					"name": "GetMaxID",
+					"description": "Get MAX ID"
+				},
+				{
+					"name": "CrossJoinWithEmpSource"
+				},
+				{
+					"name": "GenerateKeyValue",
+					"description": "Generate Key Value For Each Row"
+				},
+				{
+					"name": "GenerateNewID",
+					"description": "Add MAX ID with SurrogateKey Value"
+				},
+				{
+					"name": "unionEmployees"
+				},
+				{
+					"name": "selectRequiredColumns",
+					"description": "Select Required Columns and remove unwanted columns"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EMPID as string,",
+				"          EMPNAME as string,",
+				"          AGE as string,",
+				"          COUNTRY as string,",
+				"          SALARY as string",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'demo',",
+				"     fileName: 'Employee.txt',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> EmpSourceWithKey",
+				"source(output(",
+				"          EMPNAME as string,",
+				"          AGE as string,",
+				"          COUNTRY as string,",
+				"          SALARY as string",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'demo',",
+				"     fileName: 'EmployeeWithNoKey.txt',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> EMPSourceWithoutKey",
+				"EmpSourceWithKey aggregate(groupBy(DUMMYDATE = currentUTC()),",
+				"     MAXID = max(EMPID)) ~> GetMaxID",
+				"GetMaxID, EMPSourceWithoutKey join(true(),",
+				"     joinType:'cross',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> CrossJoinWithEmpSource",
+				"CrossJoinWithEmpSource keyGenerate(output(EMPID as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> GenerateKeyValue",
+				"GenerateKeyValue derive(EMPID = toString(toInteger(MAXID) + toInteger(EMPID))) ~> GenerateNewID",
+				"GenerateNewID, EmpSourceWithKey union(byName: true)~> unionEmployees",
+				"unionEmployees select(mapColumn(",
+				"          EMPID,",
+				"          EMPNAME,",
+				"          AGE,",
+				"          COUNTRY,",
+				"          SALARY",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectRequiredColumns",
+				"selectRequiredColumns sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'demo',",
+				"     folderPath: 'Output/IncrementKeyEmpoyees',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     partitionFileNames:['AllEmployees.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> WriteToFile"
+			]
+		}
+	}
+}
