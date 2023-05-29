@@ -1,0 +1,72 @@
+{
+	"name": "9_DF_RunningTotal",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "POForRunningTotal",
+					"description": "Connect to File \"demo/POForRunningTotal.csv\""
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "WriteToFile",
+					"description": "Write to \"demo / Output/RunningTotalByYear\""
+				}
+			],
+			"transformations": [
+				{
+					"name": "WindowForRunningTotal",
+					"description": "Calculate Running Total By Year"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          PO as string,",
+				"          ItemName as string,",
+				"          Year as string,",
+				"          Quantity as string",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'demo',",
+				"     fileName: 'POForRunningTotal.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> POForRunningTotal",
+				"POForRunningTotal window(over(Year),",
+				"     asc(Quantity, true),",
+				"     RunningTotal = sum(toInteger(Quantity))) ~> WindowForRunningTotal",
+				"WindowForRunningTotal sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'demo',",
+				"     folderPath: 'Output/RunningTotalByYear',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     partitionFileNames:['RunningTotalByYearSortByQty'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> WriteToFile"
+			]
+		}
+	}
+}
