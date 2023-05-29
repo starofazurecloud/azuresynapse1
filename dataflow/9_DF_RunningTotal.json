@@ -59,7 +59,7 @@
 				"     escapeChar: '\\\\',",
 				"     quoteChar: '\\\"',",
 				"     columnNamesAsHeader: true,",
-				"     partitionFileNames:['RunningTotalByYearSortByQty'],",
+				"     partitionFileNames:['RunningTotalByYearSortByQty.csv'],",
 				"     umask: 0022,",
 				"     preCommands: [],",
 				"     postCommands: [],",
