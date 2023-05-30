@@ -112,7 +112,8 @@
 				"     preCommands: [],",
 				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> WritetoFile"
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> WritetoFile"
 			]
 		}
 	}
