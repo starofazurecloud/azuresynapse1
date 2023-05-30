@@ -1,0 +1,87 @@
+{
+	"name": "10_LogPipeLineExecutionsThruDataFlowTasks",
+	"properties": {
+		"activities": [
+			{
+				"name": "WaitFor2Seconds",
+				"type": "Wait",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 2
+				}
+			},
+			{
+				"name": "CheckIfLogFileExists",
+				"type": "GetMetadata",
+				"dependsOn": [
+					{
+						"activity": "Set LogFileName",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "ds_LogFileDetails",
+						"type": "DatasetReference",
+						"parameters": {
+							"parFileName": {
+								"value": "@variables('varLogFileName')",
+								"type": "Expression"
+							}
+						}
+					},
+					"fieldList": [
+						"exists"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
+					}
+				}
+			},
+			{
+				"name": "Set LogFileName",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "WaitFor2Seconds",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "varLogFileName",
+					"value": {
+						"value": "@concat(formatDateTime(utcnow(),'yyyy-MM-dd'),'_log.csv')",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"varLogFileName": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "ADF Practice"
+		},
+		"annotations": []
+	}
+}

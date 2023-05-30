@@ -1,7 +1,7 @@
 {
-	"name": "10_DF_LogFile_Create",
+	"name": "10_DF_LogFile_Append",
 	"properties": {
-		"description": "This DataFlow Task will create a LogFIle for logging purpose . Video No 10 .",
+		"description": "This DataFlow Task will Append Data to LogFIle for logging purpose . Video No 10 .",
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [
@@ -12,6 +12,14 @@
 					},
 					"name": "SampleFileSource",
 					"description": "Connecting to Sample File \"demo/SampleOneValue.csv\" which has one dummy row ."
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "LogFileSource",
+					"description": "Connecting to LogFile"
 				}
 			],
 			"sinks": [
@@ -20,8 +28,7 @@
 						"referenceName": "ls_azuresynapsecoursedl",
 						"type": "LinkedServiceReference"
 					},
-					"name": "WriteToLogFile",
-					"description": "Write to the log file"
+					"name": "WritetoFile"
 				}
 			],
 			"transformations": [
@@ -32,6 +39,10 @@
 				{
 					"name": "RemoveTheDummyColumnFromTheSource",
 					"description": "Remove The Dummy Column Which is coming from the Source"
+				},
+				{
+					"name": "Combine2Sets",
+					"description": "Combine Two Sets of Data"
 				}
 			],
 			"scriptLines": [
@@ -58,6 +69,18 @@
 				"     escapeChar: '\\\\',",
 				"     quoteChar: '\\\"',",
 				"     columnNamesAsHeader: false) ~> SampleFileSource",
+				"source(useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'demo',",
+				"     folderPath: 'Output/log',",
+				"     fileName: ($FileName),",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: false) ~> LogFileSource",
 				"SampleFileSource derive(ADFName = $ADFName,",
 				"          PipelineName = $PipeLineName,",
 				"          Status = $Status,",
@@ -74,7 +97,8 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> RemoveTheDummyColumnFromTheSource",
-				"RemoveTheDummyColumnFromTheSource sink(allowSchemaDrift: true,",
+				"RemoveTheDummyColumnFromTheSource, LogFileSource union(byName: true)~> Combine2Sets",
+				"Combine2Sets sink(allowSchemaDrift: false,",
 				"     validateSchema: false,",
 				"     format: 'delimited',",
 				"     fileSystem: 'demo',",
@@ -88,8 +112,7 @@
 				"     preCommands: [],",
 				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true,",
-				"     partitionBy('hash', 1)) ~> WriteToLogFile"
+				"     skipDuplicateMapOutputs: true) ~> WritetoFile"
 			]
 		}
 	}
