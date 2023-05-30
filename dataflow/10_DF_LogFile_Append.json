@@ -113,14 +113,6 @@
 				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     mapColumn(",
-				"          ADFName,",
-				"          PipelineName,",
-				"          Status,",
-				"          RunId,",
-				"          TriggerName,",
-				"          ExecutedOn",
-				"     ),",
 				"     partitionBy('hash', 1)) ~> WritetoFile"
 			]
 		}
