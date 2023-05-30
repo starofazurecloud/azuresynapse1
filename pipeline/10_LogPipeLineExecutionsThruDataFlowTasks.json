@@ -148,7 +148,7 @@
 					],
 					"ifTrueActivities": [
 						{
-							"name": "Data flow1",
+							"name": "Data flow When Log ile Exists",
 							"type": "ExecuteDataFlow",
 							"dependsOn": [],
 							"policy": {
