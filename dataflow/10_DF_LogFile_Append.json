@@ -12,6 +12,13 @@
 					},
 					"name": "SampleFileSource",
 					"description": "Connecting to Sample File \"demo/SampleOneValue.csv\" which has one dummy row ."
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "LogFileSource"
 				}
 			],
 			"sinks": [
@@ -31,6 +38,9 @@
 				{
 					"name": "RemoveTheDummyColumnFromTheSource",
 					"description": "Remove The Dummy Column Which is coming from the Source"
+				},
+				{
+					"name": "CombineWithLogFileSource"
 				}
 			],
 			"scriptLines": [
@@ -57,6 +67,18 @@
 				"     escapeChar: '\\\\',",
 				"     quoteChar: '\\\"',",
 				"     columnNamesAsHeader: false) ~> SampleFileSource",
+				"source(useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'demo',",
+				"     folderPath: 'Output/log',",
+				"     fileName: ($FileName),",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> LogFileSource",
 				"SampleFileSource derive(ADFName = $ADFName,",
 				"          PipelineName = $PipeLineName,",
 				"          Status = $Status,",
@@ -73,7 +95,8 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> RemoveTheDummyColumnFromTheSource",
-				"RemoveTheDummyColumnFromTheSource sink(allowSchemaDrift: true,",
+				"RemoveTheDummyColumnFromTheSource, LogFileSource union(byName: true)~> CombineWithLogFileSource",
+				"CombineWithLogFileSource sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'delimited',",
 				"     fileSystem: 'demo',",
@@ -81,7 +104,7 @@
 				"     columnDelimiter: ',',",
 				"     escapeChar: '\\\\',",
 				"     quoteChar: '\\\"',",
-				"     columnNamesAsHeader: false,",
+				"     columnNamesAsHeader: true,",
 				"     partitionFileNames:[($FileName)],",
 				"     umask: 0022,",
 				"     preCommands: [],",
