@@ -12,14 +12,6 @@
 					},
 					"name": "SampleFileSource",
 					"description": "Connecting to Sample File \"demo/SampleOneValue.csv\" which has one dummy row ."
-				},
-				{
-					"linkedService": {
-						"referenceName": "ls_azuresynapsecoursedl",
-						"type": "LinkedServiceReference"
-					},
-					"name": "LogFileSource",
-					"description": "Connecting to LogFile"
 				}
 			],
 			"sinks": [
@@ -39,10 +31,6 @@
 				{
 					"name": "RemoveTheDummyColumnFromTheSource",
 					"description": "Remove The Dummy Column Which is coming from the Source"
-				},
-				{
-					"name": "Combine2Sets",
-					"description": "Combine Two Sets of Data"
 				}
 			],
 			"scriptLines": [
@@ -69,18 +57,6 @@
 				"     escapeChar: '\\\\',",
 				"     quoteChar: '\\\"',",
 				"     columnNamesAsHeader: false) ~> SampleFileSource",
-				"source(useSchema: false,",
-				"     allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     ignoreNoFilesFound: false,",
-				"     format: 'delimited',",
-				"     fileSystem: 'demo',",
-				"     folderPath: 'Output/log',",
-				"     fileName: ($FileName),",
-				"     columnDelimiter: ',',",
-				"     escapeChar: '\\\\',",
-				"     quoteChar: '\\\"',",
-				"     columnNamesAsHeader: false) ~> LogFileSource",
 				"SampleFileSource derive(ADFName = $ADFName,",
 				"          PipelineName = $PipeLineName,",
 				"          Status = $Status,",
@@ -97,8 +73,7 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> RemoveTheDummyColumnFromTheSource",
-				"RemoveTheDummyColumnFromTheSource, LogFileSource union(byName: true)~> Combine2Sets",
-				"Combine2Sets sink(allowSchemaDrift: false,",
+				"RemoveTheDummyColumnFromTheSource sink(allowSchemaDrift: false,",
 				"     validateSchema: false,",
 				"     format: 'delimited',",
 				"     fileSystem: 'demo',",
