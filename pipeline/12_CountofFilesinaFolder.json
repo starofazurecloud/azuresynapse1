@@ -55,6 +55,12 @@
 		"variables": {
 			"varFileCount": {
 				"type": "String"
+			},
+			"arrAppendVar": {
+				"type": "Array"
+			},
+			"varFileCount2": {
+				"type": "String"
 			}
 		},
 		"folder": {
