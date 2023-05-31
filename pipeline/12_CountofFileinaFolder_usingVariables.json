@@ -1,5 +1,5 @@
 {
-	"name": "12_CountofFileinaFolder",
+	"name": "12_CountofFileinaFolder_usingVariables",
 	"properties": {
 		"activities": [
 			{
@@ -54,7 +54,8 @@
 				}
 			},
 			{
-				"name": "ForEach1",
+				"name": "ForEachFile",
+				"description": "Count the No of Files inside the Folder . If there is a Folder inside the Folder , ignore that Folder",
 				"type": "ForEach",
 				"dependsOn": [
 					{
@@ -114,6 +115,9 @@
 				"type": "String"
 			},
 			"Var2": {
+				"type": "String"
+			},
+			"varFileCount": {
 				"type": "String"
 			}
 		},
