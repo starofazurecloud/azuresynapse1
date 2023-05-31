@@ -32,6 +32,7 @@
 					],
 					"storeSettings": {
 						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
 						"enablePartitionDiscovery": false
 					},
 					"formatSettings": {
@@ -79,7 +80,7 @@
 							"typeProperties": {
 								"variableName": "Var2",
 								"value": {
-									"value": "@if(equals(item().type,'folder'),string(add(int(variables('varStart')),0 )),string(add(int(variables('varStart')),1 )))",
+									"value": "@if(equals(item().type,'Folder'),string(add(int(variables('varStart')),0 )),string(add(int(variables('varStart')),1 )))",
 									"type": "Expression"
 								}
 							}
