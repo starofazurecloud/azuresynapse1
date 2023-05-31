@@ -47,7 +47,7 @@
 				"typeProperties": {
 					"variableName": "varStart",
 					"value": {
-						"value": "'0'",
+						"value": "0",
 						"type": "Expression"
 					}
 				}
@@ -79,7 +79,7 @@
 							"typeProperties": {
 								"variableName": "Var2",
 								"value": {
-									"value": "@string(add(int(variables('varStart')),1 ))",
+									"value": "@if(equals(item().type,'folder'),string(add(int(variables('varStart')),0 )),string(add(int(variables('varStart')),1 )))",
 									"type": "Expression"
 								}
 							}
