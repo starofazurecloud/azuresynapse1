@@ -137,7 +137,7 @@
 				"     store: 'cache',",
 				"     format: 'inline',",
 				"     output: false,",
-				"     saveOrder: 1,",
+				"     saveOrder: 0,",
 				"     mapColumn(",
 				"          maxEmpID",
 				"     )) ~> cachedMaxEMPID",
@@ -148,7 +148,7 @@
 				"     store: 'cache',",
 				"     format: 'inline',",
 				"     output: false,",
-				"     saveOrder: 1,",
+				"     saveOrder: 0,",
 				"     mapColumn(",
 				"          {country_code },",
 				"          country_name",
@@ -159,14 +159,7 @@
 				"     preCommands: [],",
 				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true,",
-				"     mapColumn(",
-				"          empname,",
-				"          gender,",
-				"          country,",
-				"          salary,",
-				"          emp_id",
-				"     )) ~> sink1"
+				"     skipDuplicateMapOutputs: true) ~> sink1"
 			]
 		}
 	}
