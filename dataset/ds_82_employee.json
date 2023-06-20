@@ -21,47 +21,6 @@
 			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
-		"schema": [
-			{
-				"name": "EMPID",
-				"type": "String"
-			},
-			{
-				"name": "EMPNAME",
-				"type": "String"
-			},
-			{
-				"name": "AGE",
-				"type": "String"
-			},
-			{
-				"name": "COUNTRY",
-				"type": "String"
-			},
-			{
-				"name": "SALARY",
-				"type": "String"
-			},
-			{
-				"name": "SourceFileName",
-				"type": "String"
-			},
-			{
-				"name": "PipeLineNAme",
-				"type": "String"
-			},
-			{
-				"name": "TriggeredTime",
-				"type": "String"
-			},
-			{
-				"name": "CurrentTime",
-				"type": "String"
-			},
-			{
-				"name": "Country1",
-				"type": "String"
-			}
-		]
+		"schema": []
 	}
 }
