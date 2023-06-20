@@ -1,0 +1,9 @@
+{
+	"name": "82_Cache Sink and Cache Lookup in Mappping DataFlow",
+	"properties": {
+		"folder": {
+			"name": "ADF Practice/Azure Data Factory"
+		},
+		"annotations": []
+	}
+}
