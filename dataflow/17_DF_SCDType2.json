@@ -179,7 +179,6 @@
 				"     saveOrder: 1,",
 				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
-				"          empKey = SQL_empKey,",
 				"          empid = SQL_empid,",
 				"          empname = SQL_empname,",
 				"          gender = SQL_gender,",
