@@ -173,7 +173,7 @@
 				"     updateable: true,",
 				"     deletable: false,",
 				"     upsertable: false,",
-				"     keys:['empKey'],",
+				"     keys:['empid'],",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
 				"     saveOrder: 1,",
