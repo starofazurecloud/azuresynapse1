@@ -1,0 +1,38 @@
+{
+	"name": "18_Copy_Multiple_Tables_in_Bulk",
+	"properties": {
+		"description": "Video No : https://www.youtube.com/watch?v=U5pSm0G3Vic&list=PLMWaZteqtEaLacN3eS3s8pw2jtwBVb1BH&index=18",
+		"activities": [
+			{
+				"name": "Lookup1",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select table_catalog as db_name , table_schema , table_name from information_Schema.tables where table_type = 'BASE TABLE'",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_AzureSQLDB",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			}
+		],
+		"folder": {
+			"name": "ADF Practice"
+		},
+		"annotations": []
+	}
+}
