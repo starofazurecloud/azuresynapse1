@@ -36,11 +36,11 @@
 				}
 			},
 			{
-				"name": "Lookup1",
+				"name": "Lookup1 to Execute getEmployeeCountByCountry",
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "Stored procedure1",
+						"activity": "Script To Truncate dimEpmloyee Table",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -69,11 +69,11 @@
 				}
 			},
 			{
-				"name": "Lookup2",
+				"name": "Lookup2 to execute getEmployeeDetails Procedure",
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "Lookup1",
+						"activity": "Lookup1 to Execute getEmployeeCountByCountry",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -112,7 +112,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Lookup2",
+						"activity": "Lookup2 to execute getEmployeeDetails Procedure",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -121,7 +121,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Lookup2').output.value",
+						"value": "@activity('Lookup2 to execute getEmployeeDetails Procedure').output.value",
 						"type": "Expression"
 					},
 					"isSequential": true,
@@ -236,6 +236,80 @@
 							}
 						}
 					]
+				}
+			},
+			{
+				"name": "Script To Execute getDimEmployeeDetails",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "ForEachEmployee",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSQLDB",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"parameters": [
+								{
+									"name": "country",
+									"type": "String",
+									"value": "India",
+									"direction": "Input"
+								}
+							],
+							"type": "Query",
+							"text": "exec getdimEmployeeDetails @country = @country"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			},
+			{
+				"name": "Script To Truncate dimEpmloyee Table",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "Stored procedure1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSQLDB",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "NonQuery",
+							"text": "TRUNCATE TABLE dimEmployee"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
 				}
 			}
 		],
