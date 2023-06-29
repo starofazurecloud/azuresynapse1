@@ -57,8 +57,6 @@
 						{
 							"name": "Copy data1",
 							"type": "Copy",
-							"state": "Inactive",
-							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [
 								{
 									"activity": "Script1",
@@ -92,62 +90,8 @@
 								},
 								"enableStaging": false,
 								"translator": {
-									"type": "TabularTranslator",
-									"mappings": [
-										{
-											"source": {
-												"name": "empid",
-												"type": "String",
-												"physicalType": "String"
-											},
-											"sink": {
-												"name": "Emp_Id",
-												"type": "Int32",
-												"physicalType": "int"
-											}
-										},
-										{
-											"source": {
-												"name": "empname",
-												"type": "String",
-												"physicalType": "String"
-											},
-											"sink": {
-												"name": "Emp_Name",
-												"type": "String",
-												"physicalType": "varchar"
-											}
-										},
-										{
-											"source": {
-												"name": "gender",
-												"type": "String",
-												"physicalType": "String"
-											},
-											"sink": {
-												"name": "Emp_Gender",
-												"type": "String",
-												"physicalType": "varchar"
-											}
-										},
-										{
-											"source": {
-												"name": "deptid",
-												"type": "String",
-												"physicalType": "String"
-											},
-											"sink": {
-												"name": "Dept_Id",
-												"type": "Int32",
-												"physicalType": "int"
-											}
-										}
-									],
-									"typeConversion": true,
-									"typeConversionSettings": {
-										"allowDataTruncation": true,
-										"treatBooleanAsNumber": false
-									}
+									"value": "@json(activity('Script1').output.resultSets.rows.Mapping)",
+									"type": "Expression"
 								}
 							},
 							"inputs": [
@@ -155,9 +99,12 @@
 									"referenceName": "ds_demo_Dynamic_Folder",
 									"type": "DatasetReference",
 									"parameters": {
-										"parFolderName": "21_Dynamic_Column_Mapping",
+										"parFolderName": {
+											"value": "@variables('varSourceFolder')",
+											"type": "Expression"
+										},
 										"parFileName": {
-											"value": "@activity('Script1').output.SourceFileName",
+											"value": "@activity('Script1').output.resultSets.rows.SourceFileName",
 											"type": "Expression"
 										}
 									}
@@ -165,8 +112,18 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "ds_AzureSQLDB",
-									"type": "DatasetReference"
+									"referenceName": "ds_AzureSQLTable",
+									"type": "DatasetReference",
+									"parameters": {
+										"tableName": {
+											"value": "@activity('Script1').output.resultSets.rows.Target_Table_Name",
+											"type": "Expression"
+										},
+										"schemaName": {
+											"value": "@activity('Script1').output.resultSets.rows.Target_Table_Schema",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						},
@@ -212,8 +169,9 @@
 			}
 		],
 		"variables": {
-			"varMappingJSON": {
-				"type": "String"
+			"varSourceFolder": {
+				"type": "String",
+				"defaultValue": "21_Dynamic_Column_Mapping"
 			}
 		},
 		"folder": {
