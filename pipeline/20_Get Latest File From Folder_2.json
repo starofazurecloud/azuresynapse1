@@ -1,5 +1,5 @@
 {
-	"name": "20_Get Latest File From Folder_1",
+	"name": "20_Get Latest File From Folder_2",
 	"properties": {
 		"description": "Lets Say you have 10 files in a folder and you want to process only the latest file by comparing the last modified date .\n\nThis Pipeline is going to identify which file is the most recent file .",
 		"activities": [
