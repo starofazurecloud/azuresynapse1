@@ -90,7 +90,7 @@
 								},
 								"enableStaging": false,
 								"translator": {
-									"value": "@json(activity('Script1').output.resultSets.rows.Mapping)",
+									"value": "@json(activity('Script1').output.resultSets[0].rows[0].Mapping)",
 									"type": "Expression"
 								}
 							},
@@ -104,7 +104,7 @@
 											"type": "Expression"
 										},
 										"parFileName": {
-											"value": "@activity('Script1').output.resultSets.rows.SourceFileName",
+											"value": "@activity('Script1').output.resultSets[0].rows[0].SourceFileName",
 											"type": "Expression"
 										}
 									}
@@ -116,11 +116,11 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"tableName": {
-											"value": "@activity('Script1').output.resultSets.rows.Target_Table_Name",
+											"value": "@activity('Script1').output.resultSets[0].rows[0].Target_Table_Name",
 											"type": "Expression"
 										},
 										"schemaName": {
-											"value": "@activity('Script1').output.resultSets.rows.Target_Table_Schema",
+											"value": "@activity('Script1').output.resultSets[0].rows[0].Target_Table_Schema",
 											"type": "Expression"
 										}
 									}
