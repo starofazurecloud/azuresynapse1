@@ -1,0 +1,43 @@
+{
+	"name": "ds_demo_Dynamic_Folder",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_azuresynapsecoursedl",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"parFolderName": {
+				"type": "string"
+			},
+			"parFileName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": "Sheet1",
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().parFileName",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().parFolderName",
+					"type": "Expression"
+				},
+				"fileSystem": "demo"
+			},
+			"firstRowAsHeader": true
+		},
+		"schema": [
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			}
+		]
+	}
+}

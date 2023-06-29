@@ -7,6 +7,34 @@
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
-		"schema": []
+		"schema": [
+			{
+				"name": "empKey",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Emp_Id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Emp_Name",
+				"type": "varchar"
+			},
+			{
+				"name": "Emp_Gender",
+				"type": "varchar"
+			},
+			{
+				"name": "Dept_Id",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "tbl_Employee"
+		}
 	}
 }
