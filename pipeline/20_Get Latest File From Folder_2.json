@@ -112,8 +112,8 @@
 							}
 						},
 						{
-							"name": "Set B4LastModifiedDate",
-							"type": "SetVariable",
+							"name": "If Condition1",
+							"type": "IfCondition",
 							"dependsOn": [
 								{
 									"activity": "Get Metadata2",
@@ -122,101 +122,61 @@
 									]
 								}
 							],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "varB4FileModifiedDate",
-								"value": {
-									"value": "@variables('varA4FileModifiedDate')",
+								"expression": {
+									"value": "@greater(activity('Get Metadata2').output.lastModified , variables('varLatestModifiedDate'))",
 									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "Set Final Last Modified Date",
-							"type": "SetVariable",
-							"dependsOn": [
-								{
-									"activity": "Set B4LastModifiedDate",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "varA4FileModifiedDate",
-								"value": {
-									"value": "@if(greater(activity('Get Metadata2').output.lastModified , variables('varB4FileModifiedDate')) , activity('Get Metadata2').output.lastModified , variables('varB4FileModifiedDate'))",
-									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "Set B4FileName",
-							"type": "SetVariable",
-							"dependsOn": [
-								{
-									"activity": "Get Metadata2",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "varB4FileName",
-								"value": {
-									"value": "@variables('varA4FileName')",
-									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "Set Final File Name",
-							"type": "SetVariable",
-							"dependsOn": [
-								{
-									"activity": "Set B4FileName",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "varA4FileName",
-								"value": {
-									"value": "@if(greater(activity('Get Metadata2').output.lastModified , variables('varB4FileModifiedDate')) , activity('Get Metadata2').output.itemName , variables('varB4FileName'))",
-									"type": "Expression"
-								}
+								},
+								"ifTrueActivities": [
+									{
+										"name": "Set variable2",
+										"type": "SetVariable",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"variableName": "varFileName",
+											"value": {
+												"value": "@activity('Get Metadata2').output.itemName",
+												"type": "Expression"
+											}
+										}
+									},
+									{
+										"name": "Set variable3",
+										"type": "SetVariable",
+										"dependsOn": [
+											{
+												"activity": "Set variable2",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"variableName": "varLatestModifiedDate",
+											"value": {
+												"value": "@activity('Get Metadata2').output.lastModified",
+												"type": "Expression"
+											}
+										}
+									}
+								]
 							}
 						}
 					]
@@ -248,7 +208,7 @@
 							"type": "AzureBlobFSReadSettings",
 							"recursive": true,
 							"wildcardFileName": {
-								"value": "@variables('varA4FileName')",
+								"value": "@variables('varFileName')",
 								"type": "Expression"
 							},
 							"enablePartitionDiscovery": false
@@ -280,8 +240,14 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "ds_demo",
-						"type": "DatasetReference"
+						"referenceName": "ds_demo_file",
+						"type": "DatasetReference",
+						"parameters": {
+							"parFileName": {
+								"value": "@variables('varFileName')",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"outputs": [
@@ -290,7 +256,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"parTargetFolderName": {
-								"value": "Output/@{formatDateTime(utcnow(),'yyyy-MM-dd')}",
+								"value": "Output/@{formatDateTime(adddays(utcnow(),1),'yyyy-MM-dd')}",
 								"type": "Expression"
 							}
 						}
@@ -299,16 +265,11 @@
 			}
 		],
 		"variables": {
-			"varB4FileModifiedDate": {
-				"type": "String"
+			"varLatestModifiedDate": {
+				"type": "String",
+				"defaultValue": "1900-01-01"
 			},
-			"varA4FileModifiedDate": {
-				"type": "String"
-			},
-			"varB4FileName": {
-				"type": "String"
-			},
-			"varA4FileName": {
+			"varFileName": {
 				"type": "String"
 			}
 		},
