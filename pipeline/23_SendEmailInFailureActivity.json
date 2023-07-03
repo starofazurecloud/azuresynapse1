@@ -42,7 +42,7 @@
 						"Content-Type": "application/json"
 					},
 					"body": {
-						"value": "{\n\"Pipeline\":\"@{pipeline().Pipeline}\",\n\"ErrorMessage\":\"@{activity('Fail1').Error.Message}\",\n\"DataFactoryName\":pipeline().DataFactory,\n\"ToEmail\":\"starofcloud@outlook.com;starmsahoo@gmail.com\",\n\"Subject\":\"DataFactoryFailed at @{utcnow()}\",\n\"FromPersonName\":\"Manoj Sahoo\"\n}",
+						"value": "{\n\"Pipeline\":\"@{pipeline().Pipeline}\",\n\"ErrorMessage\":\"@{activity('Fail1').Error.Message}\",\n\"DataFactoryName\":\"@{pipeline().DataFactory}\",\n\"ToEmail\":\"starofcloud@outlook.com;starmsahoo@gmail.com\",\n\"Subject\":\"DataFactoryFailed at @{utcnow()}\",\n\"FromPersonName\":\"Manoj Sahoo\"\n}",
 						"type": "Expression"
 					}
 				}
