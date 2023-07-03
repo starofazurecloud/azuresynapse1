@@ -1,0 +1,88 @@
+{
+	"name": "22_MergeMultipleRows_into_SingleRow",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "EnglandCricktersCSV"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "WriteToFolder"
+				}
+			],
+			"transformations": [
+				{
+					"name": "selectRequiredColumns"
+				},
+				{
+					"name": "GroupByHeader"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Header as string,",
+				"          Name as string,",
+				"          Age as short,",
+				"          {Batting style} as string,",
+				"          {Bowling style} as string,",
+				"          {Domestic team} as string,",
+				"          {C/T} as string,",
+				"          Forms as string,",
+				"          {S/N} as short,",
+				"          Captaincy as string,",
+				"          {Last Test} as string,",
+				"          {Last ODI} as string,",
+				"          {Last T20I} as string",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'demo',",
+				"     folderPath: '22_Merge_MultipleRows_Into_Single',",
+				"     fileName: 'England Cricket Team.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> EnglandCricktersCSV",
+				"EnglandCricktersCSV select(mapColumn(",
+				"          each(match(name==\"Header\" || name==\"Name\" || name==\"Age\" || name==\"Batting style\"))",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectRequiredColumns",
+				"selectRequiredColumns aggregate(groupBy(Header),",
+				"     Properties = replace(replace(replace(toString(collect(concat('(',Name,',',toString(Age),',',{Batting style},')')\r",
+				")) , '\"', \"\") ,'[',''),']','')\r",
+				") ~> GroupByHeader",
+				"GroupByHeader sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'demo',",
+				"     folderPath: (concat(\"Output/\",toString(currentDate(), \"yyyy-MM-dd\"),\"/22_Merge_MultipleRows_Into_Single/\")),",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     partitionFileNames:['EnglandCricketsProperties.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> WriteToFolder"
+			]
+		}
+	}
+}
