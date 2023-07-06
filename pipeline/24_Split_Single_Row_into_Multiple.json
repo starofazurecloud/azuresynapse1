@@ -21,7 +21,7 @@
 						"datasetParameters": {
 							"SourceToEnglandCricketersSkills": {
 								"parFolderName": "24_Split_Single_Row_into_Multiple",
-								"parFileName": "EnglandCrickterSkills.csv"
+								"parFileName": "EnglandCrickterSkills1.csv"
 							},
 							"sink1": {
 								"parTarget": "24_Split_Single_Row_into_Multiple"

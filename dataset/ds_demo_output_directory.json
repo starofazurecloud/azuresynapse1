@@ -17,7 +17,7 @@
 			"location": {
 				"type": "AzureBlobFSLocation",
 				"folderPath": {
-					"value": "Output/@{dataset().parTarget}/formatDateTime(utcnow(),\"yyyy-MM-dd\")",
+					"value": "Output/@{dataset().parTarget}/@{formatDateTime(utcnow(),'yyyy-MM-dd')}",
 					"type": "Expression"
 				},
 				"fileSystem": "demo"
