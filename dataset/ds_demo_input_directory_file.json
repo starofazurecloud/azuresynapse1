@@ -1,5 +1,5 @@
 {
-	"name": "ds_demo_directory_file",
+	"name": "ds_demo_input_directory_file",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_azuresynapsecoursedl",
