@@ -1,0 +1,26 @@
+{
+	"name": "ds_Source_Zip_Binary",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_azuresynapsecoursedl",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"parSourceFolderName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "Output/26_Download_Zip_File_From_API/Staging/@{dataset().parSourceFolderName}",
+					"type": "Expression"
+				},
+				"fileSystem": "demo"
+			}
+		}
+	}
+}

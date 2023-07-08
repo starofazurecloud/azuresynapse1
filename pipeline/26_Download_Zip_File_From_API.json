@@ -3,9 +3,18 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Copy Zip From API to ADLS Gen2",
+				"name": "Copy Zip From API to Staging ADLS Gen2",
 				"type": "Copy",
-				"dependsOn": [],
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [
+					{
+						"activity": "Set Target Folder Name",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -45,14 +54,105 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"parTargetFolderName": {
-								"value": "26_Download_Zip_File_From_API/@{formatDateTime(utcnow(),'yyyy-MM-dd HH:mm:ss')}",
+								"value": "26_Download_Zip_File_From_API/Staging/@{variables('varTargetFolderName')}",
 								"type": "Expression"
 							}
 						}
 					}
 				]
+			},
+			{
+				"name": "Copy From Staging to Final",
+				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [
+					{
+						"activity": "Copy Zip From API to Staging ADLS Gen2 ",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "BinarySource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"wildcardFileName": "*",
+							"deleteFilesAfterCompletion": false
+						},
+						"formatSettings": {
+							"type": "BinaryReadSettings"
+						}
+					},
+					"sink": {
+						"type": "BinarySink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_Source_Zip_Binary",
+						"type": "DatasetReference",
+						"parameters": {
+							"parSourceFolderName": {
+								"value": "@variables('varTargetFolderName')",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_Target_Binary_Unzipped",
+						"type": "DatasetReference",
+						"parameters": {
+							"parTargetFolderName": {
+								"value": "@variables('varTargetFolderName')",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "Set Target Folder Name",
+				"type": "SetVariable",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "varTargetFolderName",
+					"value": {
+						"value": "@formatDateTime(utcnow(),'yyyy-MM-dd HH:mm:ss')",
+						"type": "Expression"
+					}
+				}
 			}
 		],
+		"variables": {
+			"varTargetFolderName": {
+				"type": "String"
+			}
+		},
 		"folder": {
 			"name": "ADF Practice"
 		},
