@@ -67,6 +67,8 @@
 				"name": "Copy Data From API Using Binary Format",
 				"description": "It Uses BINARY as Source Dataset and BINARY as Target Dataset as EXCEL SINK Dataset is not supported at the moment",
 				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
