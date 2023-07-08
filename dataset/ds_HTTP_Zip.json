@@ -9,7 +9,8 @@
 		"type": "Binary",
 		"typeProperties": {
 			"location": {
-				"type": "HttpServerLocation"
+				"type": "HttpServerLocation",
+				"relativeUrl": "data/dataset/5bd7fcab-e315-42cb-8daf-50b7efc2027e/resource/0ae4d427-6fa8-4d40-8e76-c6909b5a071b/download/public_split_1_10.zip"
 			}
 		}
 	}

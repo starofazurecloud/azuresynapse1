@@ -5,8 +5,6 @@
 			{
 				"name": "Copy Zip From API to Staging ADLS Gen2",
 				"type": "Copy",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Set Target Folder Name",
@@ -64,11 +62,9 @@
 			{
 				"name": "Copy From Staging to Final",
 				"type": "Copy",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
-						"activity": "Copy Zip From API to Staging ADLS Gen2 ",
+						"activity": "Copy Zip From API to Staging ADLS Gen2",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -88,11 +84,15 @@
 						"storeSettings": {
 							"type": "AzureBlobFSReadSettings",
 							"recursive": true,
-							"wildcardFileName": "*",
+							"wildcardFileName": "*.zip.zip",
 							"deleteFilesAfterCompletion": false
 						},
 						"formatSettings": {
-							"type": "BinaryReadSettings"
+							"type": "BinaryReadSettings",
+							"compressionProperties": {
+								"type": "ZipDeflateReadSettings",
+								"preserveZipFileNameAsFolder": false
+							}
 						}
 					},
 					"sink": {
@@ -131,8 +131,6 @@
 			{
 				"name": "Set Target Folder Name",
 				"type": "SetVariable",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"secureOutput": false,

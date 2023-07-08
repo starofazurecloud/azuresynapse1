@@ -20,6 +20,10 @@
 					"type": "Expression"
 				},
 				"fileSystem": "demo"
+			},
+			"compression": {
+				"type": "ZipDeflate",
+				"level": "Fastest"
 			}
 		}
 	}
