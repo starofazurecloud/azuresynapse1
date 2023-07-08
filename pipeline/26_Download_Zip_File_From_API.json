@@ -1,6 +1,7 @@
 {
 	"name": "26_Download_Zip_File_From_API",
 	"properties": {
+		"description": "Download the Zip File from an API , Unzip it and store it in ADLS Gen 2 .\n\nThe Challenge here is we can't unzip the file directly . Microsoft Suggests \n\n1. Download the Zip File to a Staging Folder using copy activity\n\n2. Then use another copy activity to copy from Staging Folder , UnZip it and save it in the Storage Account.\n\nActivities Used :\n\n1. Set Variable : To Create the Staging Folder Name . It's a Dynamic Name with Date & Time Combined\n\n2. 1st Copy : To copy the Zip file from API to Staging Fodler\n\n3. 2nd Copy : To Copy From Staging Folder , unzip it and save it in ADLS Gen 2 Account.\n\nAPI Used here: https://data.gov.au/data/dataset/5bd7fcab-e315-42cb-8daf-50b7efc2027e/resource/0ae4d427-6fa8-4d40-8e76-c6909b5a071b/download/public_split_1_10.zip\n\n\n\n\n\n",
 		"activities": [
 			{
 				"name": "Copy Zip From API to Staging ADLS Gen2",
