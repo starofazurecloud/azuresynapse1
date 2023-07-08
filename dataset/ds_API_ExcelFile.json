@@ -1,0 +1,20 @@
+{
+	"name": "ds_API_ExcelFile",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_http",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": "Sample-spreadsheet-file",
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "/xls/Sample-Spreadsheet-10-rows.xls"
+			},
+			"firstRowAsHeader": true
+		},
+		"schema": []
+	}
+}

@@ -1,0 +1,123 @@
+{
+	"name": "25_Download_File_From_API",
+	"properties": {
+		"description": "Requirement : To Copy EXCEL File from an API and Store into a Directory in ADLS Gen 2\n\nSolution :\n1. We Used Copy Activity\n\nSource:\n----------------\n0. Linked Service :  HTTP .\n1. Source Dataset has API Connector Lined Service\n2. File Type is Binary . As we are only Copying we can select it as Binary\n\nTarget:\n-----------------\n0.Linked Service is adlsGen2\n1.TargetDataset is also binary",
+		"activities": [
+			{
+				"name": "Copy Data From API",
+				"description": "It Uses Excel as Source Dataset and CSV as Target Dataset as EXCEL SINK Dataset is not supported at the moment",
+				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "ExcelSource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET"
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_API_ExcelFile",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_demoOutput",
+						"type": "DatasetReference",
+						"parameters": {
+							"prTargetFolderName": "25_Download_File_From_API/@{formatDateTime(utcnow(),'yyyy-MM-dd HH:mm:ss')}"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy Data From API Using Binary Format",
+				"description": "It Uses BINARY as Source Dataset and BINARY as Target Dataset as EXCEL SINK Dataset is not supported at the moment",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "BinarySource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET"
+						},
+						"formatSettings": {
+							"type": "BinaryReadSettings"
+						}
+					},
+					"sink": {
+						"type": "BinarySink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_API_XLS",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_Binary",
+						"type": "DatasetReference",
+						"parameters": {
+							"parTargetFolderName": {
+								"value": "25_Download_File_From_API/@{formatDateTime(utcnow(),'yyyy-MM-dd HH:mm:ss')}",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "ADF Practice"
+		},
+		"annotations": []
+	}
+}
