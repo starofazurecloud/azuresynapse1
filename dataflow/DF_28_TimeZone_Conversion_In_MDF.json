@@ -1,0 +1,14 @@
+{
+	"name": "DF_28_TimeZone_Conversion_In_MDF",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				""
+			]
+		}
+	}
+}

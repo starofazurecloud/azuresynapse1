@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "DF_24_Split_MultipleRowsInto_Single",
+						"referenceName": "DF_24_Split_SingleRowsInto_Multiple",
 						"type": "DataFlowReference",
 						"datasetParameters": {
 							"SourceToEnglandCricketersSkills": {

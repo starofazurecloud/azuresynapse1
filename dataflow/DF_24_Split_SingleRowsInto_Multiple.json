@@ -1,5 +1,5 @@
 {
-	"name": "DF_24_Split_MultipleRowsInto_Single",
+	"name": "DF_24_Split_SingleRowsInto_Multiple",
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
