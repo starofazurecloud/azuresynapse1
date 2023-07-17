@@ -1,5 +1,5 @@
 {
-	"name": "28_Run_Activity_In_Case_of_Failure",
+	"name": "29_Run_Activity_In_Case_of_Failure",
 	"properties": {
 		"description": "Lets say you have to send an email when any of your activity fails .\n\nYour activities may run in series \n\nYour Activities may run in Parallel\n\n\nWhen running in SERIES :\n++++++++++++++++++\n1.Introduce a WEB Activity as last step\n2. Connect On Failure and On Skip of it's previous activity to it .\n3. if set var1 fails , the set var 2 & set var3 . And on SetVar3 activity we have setu of OnFailure & ON Skip . So this case On Skip will trigger email activity\n\n4. If set var1 succeeds , set var2 fails , so set var3 will be skipped and again it will trigger email activity\n\n5. if set var1 succeeds ,set var2 succeeds and set var3 fails , it will trigger email activity as it connected with ON FAILURE .\n\n\nWhen running in PARALLEL :\n++++++++++++++++++\n1.Introduce a DUMMY WAIT Activity .\nIt will run when all it's previous activity succeeds .\n2. If any of it's connected acitivity fails, this DUMMY ACTIVITY wont run .\n3. When DUMMY ACTIVY won't run which will trigger a SKIP Activity and then it will trigger the WEB EMAIL Activity.",
 		"activities": [
