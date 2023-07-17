@@ -1,7 +1,7 @@
 {
 	"name": "30_1_Dynamic_Capture_Error_Message",
 	"properties": {
-		"description": "\nScenario:\n+++++++++++\n\nCapture error message of activity .\nThese activities are running in parallel.\nIf any activity fails , then capture the message\n\n\nactivity('Set Variable1').Error?.message\n\nactivity('Set Variable1')?.Error?.message\n\nQuestion Mark ( ? ) next to Activity  : This is required for NULL Safe .\nThis wont throw error if the activity hasn't run\n\n\nQuestion Mark ( ? ) next to Error :\nThis wont throw error if the activity doesn't have any error.",
+		"description": "\nScenario:\n+++++++++++\n\nCapture error message of activity .\nThese activities are running in parallel.\nIf any activity fails , then capture the message\n\n\nactivity('Set Variable1').Error?.message\n\nactivity('Set Variable1')?.Error?.message\n\nQuestion Mark ( ? ) next to Activity  : This is required for NULL Safe .\nThis wont throw error if the activity hasn't run\n\n\nQuestion Mark ( ? ) next to Property which is  Error here:\nThis wont throw error if the activity doesn't have any error.",
 		"activities": [
 			{
 				"name": "Set variable1",
