@@ -21,6 +21,9 @@
 						"type": "IntegrationRuntimeReference"
 					},
 					"method": "POST",
+					"body": {
+						"duration": 20
+					},
 					"authentication": {
 						"type": "MSI",
 						"resource": "https://management.azure.com/"
@@ -28,6 +31,14 @@
 				}
 			}
 		],
+		"variables": {
+			"pipelineRunID": {
+				"type": "String"
+			},
+			"pipelineStatus": {
+				"type": "String"
+			}
+		},
 		"folder": {
 			"name": "ADF Practice"
 		},
