@@ -1,5 +1,5 @@
 {
-	"name": "31_Call_Another_ADF_Pipeline",
+	"name": "31_1_Call_Another_ADF_Pipeline",
 	"properties": {
 		"activities": [
 			{
@@ -36,6 +36,12 @@
 				"type": "String"
 			},
 			"pipelineStatus": {
+				"type": "String"
+			},
+			"varStartCounter": {
+				"type": "String"
+			},
+			"varCounter": {
 				"type": "String"
 			}
 		},

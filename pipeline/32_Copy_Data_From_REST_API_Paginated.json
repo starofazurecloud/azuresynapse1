@@ -1,0 +1,236 @@
+{
+	"name": "32_Copy_Data_From_REST_API_Paginated",
+	"properties": {
+		"description": "Sample API : https://reqres.in/api/users?page=1\n\nRequirement:\n\nDownload data from the API which gives data in different pages  and write to files\n\n1. Connect to REST API\n2. Supply the Page Number\n3. Use the Copy Activity to copy the data from that page and write it to file\n\n",
+		"activities": [
+			{
+				"name": "Web to Sample REST API",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://reqres.in/api/users?page=1",
+					"connectVia": {
+						"referenceName": "AutoResolveIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET"
+				}
+			},
+			{
+				"name": "Set Start Value",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Web to Sample REST API",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "varStartCounter",
+					"value": "1"
+				}
+			},
+			{
+				"name": "Until1",
+				"type": "Until",
+				"dependsOn": [
+					{
+						"activity": "Set Start Value",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(add(activity('Web to Sample REST API').output.total_pages,1),int(variables('varStartCounter')))",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Set variable1",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "varCounter",
+								"value": {
+									"value": "@variables('varStartCounter')",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Set variable1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "RestSource",
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "GET",
+									"paginationRules": {
+										"supportRFC5988": "true"
+									}
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".csv"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"path": "['id']"
+											},
+											"sink": {
+												"name": "id"
+											}
+										},
+										{
+											"source": {
+												"path": "['email']"
+											},
+											"sink": {
+												"name": "email"
+											}
+										},
+										{
+											"source": {
+												"path": "['first_name']"
+											},
+											"sink": {
+												"name": "first_name"
+											}
+										},
+										{
+											"source": {
+												"path": "['last_name']"
+											},
+											"sink": {
+												"name": "last_name"
+											}
+										},
+										{
+											"source": {
+												"path": "['avatar']"
+											},
+											"sink": {
+												"name": "avatar"
+											}
+										}
+									],
+									"collectionReference": "$['data']",
+									"mapComplexValuesToString": false
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "RestAPITO_reqres_dot_in",
+									"type": "DatasetReference",
+									"parameters": {
+										"parPageNo": {
+											"value": "@variables('varStartCounter')",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_demo_output_directory",
+									"type": "DatasetReference",
+									"parameters": {
+										"parTarget": "32_Copy_Data_From_REST_API_Paginated"
+									}
+								}
+							]
+						},
+						{
+							"name": "Set variable2",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Copy data1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "varStartCounter",
+								"value": {
+									"value": "@string(add(int(variables('varCounter')),1))",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"timeout": "0.12:00:00"
+				}
+			}
+		],
+		"variables": {
+			"varStartCounter": {
+				"type": "String"
+			},
+			"varCounter": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "ADF Practice"
+		},
+		"annotations": []
+	}
+}
