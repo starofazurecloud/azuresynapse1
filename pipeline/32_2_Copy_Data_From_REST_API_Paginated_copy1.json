@@ -1,5 +1,5 @@
 {
-	"name": "32_1_Copy_Data_From_REST_API_Paginated",
+	"name": "32_2_Copy_Data_From_REST_API_Paginated_copy1",
 	"properties": {
 		"description": "Sample API : https://reqres.in/api/users?page=1\n\nRequirement:\n\nDownload data from the API which gives data in different pages  and write to files\n\n1. Connect to REST API\n2. Supply the Page Number\n3. Use the Copy Activity to copy the data from that page and write it to file\n\n",
 		"activities": [
