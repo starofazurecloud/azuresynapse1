@@ -29,6 +29,9 @@
 				},
 				{
 					"name": "aggregate1"
+				},
+				{
+					"name": "sort1"
 				}
 			],
 			"scriptLines": [
@@ -55,7 +58,8 @@
 				"Purchases aggregate(groupBy(CustId,",
 				"          CustName),",
 				"     Purchases = collect(Purchases)) ~> aggregate1",
-				"aggregate1 sink(allowSchemaDrift: true,",
+				"aggregate1 sort(asc(CustId, true)) ~> sort1",
+				"sort1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'json',",
 				"     fileSystem: 'demo',",
