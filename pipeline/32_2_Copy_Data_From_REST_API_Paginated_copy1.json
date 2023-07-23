@@ -25,8 +25,8 @@
 				}
 			},
 			{
-				"name": "Set Start Value",
-				"type": "SetVariable",
+				"name": "ForEachPage",
+				"type": "ForEach",
 				"dependsOn": [
 					{
 						"activity": "Web to Sample REST API",
@@ -35,62 +35,18 @@
 						]
 					}
 				],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
-				},
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "varStartCounter",
-					"value": "1"
-				}
-			},
-			{
-				"name": "Until1",
-				"type": "Until",
-				"dependsOn": [
-					{
-						"activity": "Set Start Value",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"expression": {
-						"value": "@equals(add(activity('Web to Sample REST API').output.total_pages,1),int(variables('varStartCounter')))",
+					"items": {
+						"value": "@range(1,activity('Web to Sample REST API').output.total_pages)",
 						"type": "Expression"
 					},
+					"isSequential": true,
 					"activities": [
-						{
-							"name": "Set variable1",
-							"type": "SetVariable",
-							"dependsOn": [],
-							"policy": {
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "varCounter",
-								"value": {
-									"value": "@variables('varStartCounter')",
-									"type": "Expression"
-								}
-							}
-						},
 						{
 							"name": "Copy data1",
 							"type": "Copy",
-							"dependsOn": [
-								{
-									"activity": "Set variable1",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
+							"dependsOn": [],
 							"policy": {
 								"timeout": "0.12:00:00",
 								"retry": 0,
@@ -165,8 +121,7 @@
 											}
 										}
 									],
-									"collectionReference": "$['data']",
-									"mapComplexValuesToString": false
+									"collectionReference": "$['data']"
 								}
 							},
 							"inputs": [
@@ -175,7 +130,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"parPageNo": {
-											"value": "@variables('varStartCounter')",
+											"value": "@item()",
 											"type": "Expression"
 										}
 									}
@@ -183,40 +138,19 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "ds_demo_output_directory",
+									"referenceName": "ds_demo_Output_Directoty_N_File",
 									"type": "DatasetReference",
 									"parameters": {
-										"parTarget": "32_Copy_Data_From_REST_API_Paginated"
+										"parTargetFolderName": "32_Copy_Data_From_REST_API_Paginated",
+										"parTargetFileName": {
+											"value": "API_Page_@{item()}",
+											"type": "Expression"
+										}
 									}
 								}
 							]
-						},
-						{
-							"name": "Set variable2",
-							"type": "SetVariable",
-							"dependsOn": [
-								{
-									"activity": "Copy data1",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "varStartCounter",
-								"value": {
-									"value": "@string(add(int(variables('varCounter')),1))",
-									"type": "Expression"
-								}
-							}
 						}
-					],
-					"timeout": "0.12:00:00"
+					]
 				}
 			}
 		],
