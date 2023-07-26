@@ -1,6 +1,7 @@
 {
 	"name": "35_1_Compare_Source_Target_MDF",
 	"properties": {
+		"description": "\nThis is Approach No - 1 by Exists Transformation , Hashkey with All columns \n\ncompare Source File with Target File .\n\nOnly Write UnMatched Lines to New File",
 		"activities": [
 			{
 				"name": "Data flow1",
