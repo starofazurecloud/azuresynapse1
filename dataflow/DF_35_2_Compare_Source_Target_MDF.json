@@ -165,15 +165,18 @@
 				"     format: 'delimited',",
 				"     fileSystem: 'demo',",
 				"     folderPath: (concatWS('/', 'Output', $parTargetFolder)),",
+				"     truncate: true,",
 				"     columnDelimiter: ',',",
 				"     escapeChar: '\\\\',",
 				"     quoteChar: '\\\"',",
 				"     columnNamesAsHeader: true,",
+				"     partitionFileNames:['NewCricketers.csv'],",
 				"     umask: 0022,",
 				"     preCommands: [],",
 				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> WriteToFile"
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> WriteToFile"
 			]
 		}
 	}
