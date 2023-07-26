@@ -1,0 +1,180 @@
+{
+	"name": "DF_35_2_Compare_Source_Target_MDF",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "SourceData"
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "DataToCompareWith"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "WriteToFile"
+				}
+			],
+			"transformations": [
+				{
+					"name": "GenerateHashColumn"
+				},
+				{
+					"name": "GenerateHasForTarget"
+				},
+				{
+					"name": "SelectSourceColumns"
+				},
+				{
+					"name": "SelectTargetColumns"
+				},
+				{
+					"name": "joinWithTarget"
+				},
+				{
+					"name": "KeepOnlyNewClicketers"
+				},
+				{
+					"name": "KeepOnlySourceColumns"
+				},
+				{
+					"name": "RenameColumns"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     parTargetFolder as string (\"35_Compare_Source_Target_MDF\")",
+				"}",
+				"source(output(",
+				"          Header as string,",
+				"          Name as string,",
+				"          Age as short,",
+				"          {Batting style} as string,",
+				"          {Bowling style} as string,",
+				"          {Domestic team} as string,",
+				"          {C/T} as string,",
+				"          Forms as string,",
+				"          {S/N} as short,",
+				"          Captaincy as string,",
+				"          {Last Test} as string,",
+				"          {Last ODI} as string,",
+				"          {Last T20I} as string",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'demo',",
+				"     folderPath: '35_Compare_Source_Target_MDF',",
+				"     fileName: 'SourceData.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> SourceData",
+				"source(output(",
+				"          Header as string,",
+				"          Name as string,",
+				"          Age as short,",
+				"          {Batting style} as string,",
+				"          {Bowling style} as string,",
+				"          {Domestic team} as string,",
+				"          {C/T} as string,",
+				"          Forms as string,",
+				"          {S/N} as short,",
+				"          Captaincy as string,",
+				"          {Last Test} as short,",
+				"          {Last ODI} as string,",
+				"          {Last T20I} as string",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'demo',",
+				"     folderPath: '35_Compare_Source_Target_MDF',",
+				"     fileName: 'CompareWith.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> DataToCompareWith",
+				"SelectSourceColumns derive(HashValueSource = sha2(256,Header,Name,Age,{Batting style})) ~> GenerateHashColumn",
+				"SelectTargetColumns derive(HashValueTarget = sha2(256,Header,Name,Age,{Batting style})) ~> GenerateHasForTarget",
+				"SourceData select(mapColumn(",
+				"          Header,",
+				"          Name,",
+				"          Age,",
+				"          {Batting style},",
+				"          {Bowling style}",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SelectSourceColumns",
+				"DataToCompareWith select(mapColumn(",
+				"          Header,",
+				"          Name,",
+				"          Age,",
+				"          {Batting style},",
+				"          {Bowling style}",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SelectTargetColumns",
+				"GenerateHashColumn, GenerateHasForTarget join(HashValueSource == HashValueTarget,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinWithTarget",
+				"RenameColumns filter(isNull(Target_HashValue)) ~> KeepOnlyNewClicketers",
+				"KeepOnlyNewClicketers select(mapColumn(",
+				"          each(match(startsWith(name, 'Source')),",
+				"               replace($0, 'Source_', '') = $$)",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: true) ~> KeepOnlySourceColumns",
+				"joinWithTarget select(mapColumn(",
+				"          Source_Header = SelectSourceColumns@Header,",
+				"          Source_Name = SelectSourceColumns@Name,",
+				"          Source_Age = SelectSourceColumns@Age,",
+				"          {Source_Batting style} = SelectSourceColumns@{Batting style},",
+				"          {Source_Bowling style} = SelectSourceColumns@{Bowling style},",
+				"          Source_HashValue = HashValueSource,",
+				"          Target_Header = SelectTargetColumns@Header,",
+				"          Target_Name = SelectTargetColumns@Name,",
+				"          Target_Age = SelectTargetColumns@Age,",
+				"          {Target_Batting style} = SelectTargetColumns@{Batting style},",
+				"          {Target_Bowling style} = SelectTargetColumns@{Bowling style},",
+				"          Target_HashValue = HashValueTarget",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: false) ~> RenameColumns",
+				"KeepOnlySourceColumns sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'demo',",
+				"     folderPath: (concatWS('/', 'Output', $parTargetFolder)),",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> WriteToFile"
+			]
+		}
+	}
+}
