@@ -31,66 +31,6 @@
 					},
 					"firstRowOnly": false
 				}
-			},
-			{
-				"name": "ForEach1",
-				"type": "ForEach",
-				"dependsOn": [
-					{
-						"activity": "Lookup Employee Skills",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"items": {
-						"value": "@activity('Lookup Employee Skills').output.value",
-						"type": "Expression"
-					},
-					"isSequential": true,
-					"activities": [
-						{
-							"name": "If Condition1",
-							"type": "IfCondition",
-							"dependsOn": [],
-							"userProperties": [],
-							"typeProperties": {
-								"ifTrueActivities": [
-									{
-										"name": "Lookup1",
-										"type": "Lookup",
-										"dependsOn": [],
-										"policy": {
-											"timeout": "0.12:00:00",
-											"retry": 0,
-											"retryIntervalInSeconds": 30,
-											"secureOutput": false,
-											"secureInput": false
-										},
-										"userProperties": [],
-										"typeProperties": {
-											"source": {
-												"type": "AzureSqlSource",
-												"sqlReaderQuery": {
-													"value": "EXEC SP_EXECUTESQL N'CREATE SCHEMA demo' \n\nSELECT 1 AS ID",
-													"type": "Expression"
-												},
-												"queryTimeout": "02:00:00",
-												"partitionOption": "None"
-											},
-											"dataset": {
-												"referenceName": "ds_SQL_Employee",
-												"type": "DatasetReference"
-											}
-										}
-									}
-								]
-							}
-						}
-					]
-				}
 			}
 		],
 		"variables": {
