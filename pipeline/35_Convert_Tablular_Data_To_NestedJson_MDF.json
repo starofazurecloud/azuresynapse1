@@ -1,0 +1,35 @@
+{
+	"name": "35_Convert_Tablular_Data_To_NestedJson_MDF",
+	"properties": {
+		"activities": [
+			{
+				"name": "Convert Tablular Data To NestedJson",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "DF_Convert_TablularData_To_NestedJson",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "ADF Practice/Azure Content"
+		},
+		"annotations": []
+	}
+}
