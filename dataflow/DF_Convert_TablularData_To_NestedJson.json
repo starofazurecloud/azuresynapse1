@@ -62,7 +62,7 @@
 				"     validateSchema: false,",
 				"     format: 'json',",
 				"     fileSystem: 'demo',",
-				"     folderPath: 'Output/Output35_ByAnnu_ConvertTablularDatatoNestedJson',",
+				"     folderPath: 'Output/35_ByAnnu_ConvertTablularDatatoNestedJson',",
 				"     truncate: true,",
 				"     partitionFileNames:['ConvertedtoJson.json'],",
 				"     umask: 0022,",
