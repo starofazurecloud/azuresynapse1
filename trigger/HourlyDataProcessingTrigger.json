@@ -28,6 +28,10 @@
 						"referenceName": "HourlyLogsTrigger",
 						"type": "TriggerReference"
 					}
+				},
+				{
+					"type": "SelfDependencyTumblingWindowTriggerReference",
+					"offset": "-1.00:00:00"
 				}
 			]
 		}
