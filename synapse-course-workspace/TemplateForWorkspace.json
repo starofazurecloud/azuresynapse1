@@ -57,14 +57,6 @@
 			"type": "string",
 			"defaultValue": "https://azuresynapsecoursedl.dfs.core.windows.net"
 		},
-		"Evetn Trigger_properties_PL_11_Event_Based_Trigger_parameters_sourcePath": {
-			"type": "string",
-			"defaultValue": "@triggerBody().folderPath"
-		},
-		"Evetn Trigger_properties_PL_11_Event_Based_Trigger_parameters_sourceFileName": {
-			"type": "string",
-			"defaultValue": "@triggerBody().fileName"
-		},
 		"Evetn Trigger_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/1101ab50-b9a6-4719-afe5-7586e598ea9f/resourceGroups/synapse-course-rg/providers/Microsoft.Storage/storageAccounts/azuresynapsecoursedl"
@@ -7008,50 +7000,75 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Wait1",
-						"type": "Wait",
+						"name": "Copy data1",
+						"type": "Copy",
 						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": 5
-						}
-					},
-					{
-						"name": "Set variable1",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "Wait1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
 						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
 							"secureOutput": false,
 							"secureInput": false
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"variableName": "vInputParameters",
-							"value": {
-								"value": "@pipeline().parameters.sourceFileName",
-								"type": "Expression"
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"wildcardFileName": "*.csv",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
 							}
-						}
+						},
+						"inputs": [
+							{
+								"referenceName": "ds_p2_EmployeeRefrence",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_p2_11_tgt_folder",
+								"type": "DatasetReference",
+								"parameters": {
+									"folderName": {
+										"value": "output",
+										"type": "Expression"
+									}
+								}
+							}
+						]
 					}
 				],
 				"policy": {
 					"elapsedTimeMetric": {},
 					"cancelAfter": {}
-				},
-				"parameters": {
-					"sourcePath": {
-						"type": "string"
-					},
-					"sourceFileName": {
-						"type": "string"
-					}
 				},
 				"variables": {
 					"vInputParameters": {
@@ -7063,7 +7080,10 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/ds_p2_EmployeeRefrence')]",
+				"[concat(variables('workspaceId'), '/datasets/ds_p2_11_tgt_folder')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('workspaceName'), '/RestAPITO_reqres_dot_in')]",
@@ -8415,10 +8435,7 @@
 							"referenceName": "PL_11_Event_Based_Trigger",
 							"type": "PipelineReference"
 						},
-						"parameters": {
-							"sourcePath": "[parameters('Evetn Trigger_properties_PL_11_Event_Based_Trigger_parameters_sourcePath')]",
-							"sourceFileName": "[parameters('Evetn Trigger_properties_PL_11_Event_Based_Trigger_parameters_sourceFileName')]"
-						}
+						"parameters": {}
 					}
 				],
 				"type": "BlobEventsTrigger",
@@ -12138,6 +12155,70 @@
 			},
 			"dependsOn": [],
 			"location": "centralindia"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ds_p2_EmployeeRefrence')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_azuresynapsecoursedl",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "input/S_11_Event_Based_Trigger",
+						"fileSystem": "practice"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_azuresynapsecoursedl')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ds_p2_11_tgt_folder')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_azuresynapsecoursedl",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"folderName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@dataset().folderName",
+							"type": "Expression"
+						},
+						"fileSystem": "practice"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_azuresynapsecoursedl')]"
+			]
 		}
 	]
 }

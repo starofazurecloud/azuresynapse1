@@ -41,12 +41,6 @@
 		"synapse-course-workspace-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"value": "https://azuresynapsecoursedl.dfs.core.windows.net"
 		},
-		"Evetn Trigger_properties_PL_11_Event_Based_Trigger_parameters_sourcePath": {
-			"value": "@triggerBody().folderPath"
-		},
-		"Evetn Trigger_properties_PL_11_Event_Based_Trigger_parameters_sourceFileName": {
-			"value": "@triggerBody().fileName"
-		},
 		"Evetn Trigger_properties_typeProperties_scope": {
 			"value": "/subscriptions/1101ab50-b9a6-4719-afe5-7586e598ea9f/resourceGroups/synapse-course-rg/providers/Microsoft.Storage/storageAccounts/azuresynapsecoursedl"
 		}
