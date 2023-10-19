@@ -8423,7 +8423,7 @@
 				],
 				"type": "BlobEventsTrigger",
 				"typeProperties": {
-					"blobPathBeginsWith": "/practice/blobs/input / S_11_Event_Based_Trigger",
+					"blobPathBeginsWith": "/practice/blobs/input / S_11_Event_Based_Trigger/",
 					"blobPathEndsWith": ".txt",
 					"ignoreEmptyBlobs": true,
 					"scope": "[parameters('Evetn Trigger_properties_typeProperties_scope')]",
