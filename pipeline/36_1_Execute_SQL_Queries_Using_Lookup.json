@@ -1,0 +1,134 @@
+{
+	"name": "36_1_Execute_SQL_Queries_Using_Lookup",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup Employee Skills",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT * FROM dbo.EmployeeSkills",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_SQL_Employee",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEachEmployee",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup Employee Skills",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup Employee Skills').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "If Employee is Liam",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "Set variable1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@equals(toUpper(item().name),'LIAM LIVINGSTONE')",
+									"type": "Expression"
+								},
+								"ifTrueActivities": [
+									{
+										"name": "UpdateEmployeeName",
+										"type": "Lookup",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "AzureSqlSource",
+												"sqlReaderQuery": {
+													"value": "update dbo.EmployeeSkills set name = '@{variables('varNewName')}' where name = '@{variables('varEmployeeOldName')}' ; SELECT 1 AS ID",
+													"type": "Expression"
+												},
+												"queryTimeout": "02:00:00",
+												"partitionOption": "None"
+											},
+											"dataset": {
+												"referenceName": "ds_SQL_Employee",
+												"type": "DatasetReference"
+											}
+										}
+									}
+								]
+							}
+						},
+						{
+							"name": "Set variable1",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "varEmployeeOldName",
+								"value": {
+									"value": "@item().name",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"varNewName": {
+				"type": "String",
+				"defaultValue": "LivingStone"
+			},
+			"varEmployeeOldName": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "ADF Practice"
+		},
+		"annotations": []
+	}
+}

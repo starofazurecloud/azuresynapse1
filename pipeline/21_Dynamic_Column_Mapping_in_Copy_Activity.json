@@ -1,0 +1,183 @@
+{
+	"name": "21_Dynamic_Column_Mapping_in_Copy_Activity",
+	"properties": {
+		"description": "Let Say you have Multiple Excel Files and you want to load those files into respective tables  with following differences\n\n1. Employee.xlsx file data should go to tbl_Employee Table\n\n2.Department.xlsx file data should go to tbl_Department Table\n\n3. All these files have different Column Names . Means File Column Name and  Table Column Names are different .\n\nThis Pipeline will demonstrate that .",
+		"activities": [
+			{
+				"name": "Get Metadata1",
+				"type": "GetMetadata",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "ds_demo_source_folder",
+						"type": "DatasetReference",
+						"parameters": {
+							"parFolderName": "21_Dynamic_Column_Mapping"
+						}
+					},
+					"fieldList": [
+						"childItems"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
+					}
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get Metadata1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get Metadata1').output.childItems",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Script1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "ExcelSource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false
+									}
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false,
+									"disableMetricsCollection": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"value": "@json(activity('Script1').output.resultSets[0].rows[0].Mapping)",
+									"type": "Expression"
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_demo_Dynamic_Folder",
+									"type": "DatasetReference",
+									"parameters": {
+										"parFolderName": {
+											"value": "@variables('varSourceFolder')",
+											"type": "Expression"
+										},
+										"parFileName": {
+											"value": "@activity('Script1').output.resultSets[0].rows[0].SourceFileName",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_AzureSQLTable",
+									"type": "DatasetReference",
+									"parameters": {
+										"tableName": {
+											"value": "@activity('Script1').output.resultSets[0].rows[0].Target_Table_Name",
+											"type": "Expression"
+										},
+										"schemaName": {
+											"value": "@activity('Script1').output.resultSets[0].rows[0].Target_Table_Schema",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "Script1",
+							"type": "Script",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "ls_AzureSQLDB",
+								"type": "LinkedServiceReference"
+							},
+							"typeProperties": {
+								"scripts": [
+									{
+										"parameters": [
+											{
+												"name": "SourceFileName",
+												"type": "String",
+												"value": {
+													"value": "@item().name",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											}
+										],
+										"type": "Query",
+										"text": "select SourceFileName ,Target_Table_Schema  , Target_Table_Name ,Mapping from tbl_Mapping where SourceFileName = @SourceFileName"
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"varSourceFolder": {
+				"type": "String",
+				"defaultValue": "21_Dynamic_Column_Mapping"
+			}
+		},
+		"folder": {
+			"name": "ADF Practice"
+		},
+		"annotations": []
+	}
+}

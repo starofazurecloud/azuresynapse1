@@ -1,0 +1,107 @@
+{
+	"name": "14_ConvertArraytoString",
+	"properties": {
+		"activities": [
+			{
+				"name": "LookupEmployee",
+				"description": "Requirement is to Read a FIle with Single Column and generate a String with comma separated value",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"dataset": {
+						"referenceName": "ds_Employee",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEachEmployee",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "LookupEmployee",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('LookupEmployee').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Set EmployeeName",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "varTempEployeeName",
+								"value": {
+									"value": "@variables('varAppendEmpNames')",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set variable to Append Name",
+							"description": "Variable to Append Names with Semicolon Separated",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Set EmployeeName",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "varAppendEmpNames",
+								"value": {
+									"value": "@concat(variables('varTempEployeeName'),item().EMPNAME,';')",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"varTempEployeeName": {
+				"type": "String"
+			},
+			"varAppendEmpNames": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "ADF Practice"
+		},
+		"annotations": []
+	}
+}

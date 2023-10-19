@@ -1,0 +1,17 @@
+{
+	"name": "ds_API_XLS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_http",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "xls/Sample-Spreadsheet-10000-rows.xls"
+			}
+		}
+	}
+}

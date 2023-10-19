@@ -1,0 +1,44 @@
+{
+	"name": "28_TimeZoneConversion_in_MDF",
+	"properties": {
+		"activities": [
+			{
+				"name": "Time Zone Conversion",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "DF_28_TimeZone_Conversion_In_MDF",
+						"type": "DataFlowReference",
+						"parameters": {
+							"parFolderName": "'28_TimeZone_Conversion_in_MDF'",
+							"parFileName": "'EnglandCricketersEntryTiing.csv'"
+						},
+						"datasetParameters": {
+							"writeToFolder": {
+								"parTarget": "28_TimeZone_Conversion_in_MDF"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "ADF Practice"
+		},
+		"annotations": []
+	}
+}

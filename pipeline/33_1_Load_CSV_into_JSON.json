@@ -1,0 +1,116 @@
+{
+	"name": "33_1_Load_CSV_into_JSON",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"additionalColumns": [
+							{
+								"name": "Purchases",
+								"value": "$$COLUMN:ItemName"
+							}
+						],
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "JsonSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "JsonWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "CustId",
+									"type": "String"
+								},
+								"sink": {
+									"path": "$['CustId']"
+								}
+							},
+							{
+								"source": {
+									"name": "CustName",
+									"type": "String"
+								},
+								"sink": {
+									"path": "$['CustName']"
+								}
+							},
+							{
+								"source": {
+									"name": "ItemName",
+									"type": "String"
+								},
+								"sink": {
+									"path": "$['Purchases']['ItemName']"
+								}
+							},
+							{
+								"source": {
+									"name": "Quantity",
+									"type": "String"
+								},
+								"sink": {
+									"path": "$['Purchases']['Quantity']"
+								}
+							}
+						]
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_demo_input_directory_file",
+						"type": "DatasetReference",
+						"parameters": {
+							"parFolderName": "33_Load_CSV_into_JSON",
+							"parFileName": "CustomerPurchases.csv"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_Output_JSON",
+						"type": "DatasetReference",
+						"parameters": {
+							"parOutputFolder": {
+								"value": "33_Load_CSV_into_JSON",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "ADF Practice"
+		},
+		"annotations": []
+	}
+}

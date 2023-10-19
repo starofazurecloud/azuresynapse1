@@ -1,0 +1,170 @@
+{
+	"name": "32_2_Copy_Data_From_REST_API_Paginated_copy1",
+	"properties": {
+		"description": "Sample API : https://reqres.in/api/users?page=1\n\nRequirement:\n\nDownload data from the API which gives data in different pages  and write to files\n\n1. Connect to REST API\n2. Supply the Page Number\n3. Use the Copy Activity to copy the data from that page and write it to file\n\n",
+		"activities": [
+			{
+				"name": "Web to Sample REST API",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://reqres.in/api/users?page=1",
+					"connectVia": {
+						"referenceName": "AutoResolveIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET"
+				}
+			},
+			{
+				"name": "ForEachPage",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Web to Sample REST API",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@range(1,activity('Web to Sample REST API').output.total_pages)",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "RestSource",
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "GET",
+									"paginationRules": {
+										"supportRFC5988": "true"
+									}
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".csv"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"path": "['id']"
+											},
+											"sink": {
+												"name": "id"
+											}
+										},
+										{
+											"source": {
+												"path": "['email']"
+											},
+											"sink": {
+												"name": "email"
+											}
+										},
+										{
+											"source": {
+												"path": "['first_name']"
+											},
+											"sink": {
+												"name": "first_name"
+											}
+										},
+										{
+											"source": {
+												"path": "['last_name']"
+											},
+											"sink": {
+												"name": "last_name"
+											}
+										},
+										{
+											"source": {
+												"path": "['avatar']"
+											},
+											"sink": {
+												"name": "avatar"
+											}
+										}
+									],
+									"collectionReference": "$['data']"
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "RestAPITO_reqres_dot_in",
+									"type": "DatasetReference",
+									"parameters": {
+										"parPageNo": {
+											"value": "@item()",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_demo_Output_Directoty_N_File",
+									"type": "DatasetReference",
+									"parameters": {
+										"parTargetFolderName": "32_Copy_Data_From_REST_API_Paginated",
+										"parTargetFileName": {
+											"value": "API_Page_@{item()}",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"varStartCounter": {
+				"type": "String"
+			},
+			"varCounter": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "ADF Practice"
+		},
+		"annotations": []
+	}
+}

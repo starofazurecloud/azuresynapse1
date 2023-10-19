@@ -1,0 +1,39 @@
+{
+	"name": "HourlyDataProcessingTrigger",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipeline": {
+			"pipelineReference": {
+				"referenceName": "PL_10_HourlyDataProcessing",
+				"type": "PipelineReference"
+			}
+		},
+		"type": "TumblingWindowTrigger",
+		"typeProperties": {
+			"frequency": "Minute",
+			"interval": 15,
+			"startTime": "2023-10-17T09:00:00Z",
+			"endTime": "2023-10-25T03:20:00Z",
+			"delay": "00:00:00",
+			"maxConcurrency": 50,
+			"retryPolicy": {
+				"intervalInSeconds": 30
+			},
+			"dependsOn": [
+				{
+					"type": "TumblingWindowTriggerDependencyReference",
+					"offset": "0.00:00:00",
+					"referenceTrigger": {
+						"referenceName": "HourlyLogsTrigger",
+						"type": "TriggerReference"
+					}
+				},
+				{
+					"type": "SelfDependencyTumblingWindowTriggerReference",
+					"offset": "-1.00:00:00"
+				}
+			]
+		}
+	}
+}

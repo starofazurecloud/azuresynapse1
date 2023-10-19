@@ -1,0 +1,20 @@
+{
+	"name": "4_Explore_CSV_Trip_Type",
+	"properties": {
+		"folder": {
+			"name": "1_NYC_Taxi/1_Discovery"
+		},
+		"content": {
+			"query": "-- Read TripType.csv\n-- Connect to Built in Serverless SQL Pool\n-- Connect to nyc_taxi_discovery Database\n\nUSE nyc_taxi_discovery\nGO\n\nSELECT *\nFROM OPENROWSET(\nBULK 'trip_type.tsv' ,\nDATA_SOURCE = 'nyc_taxi_data_raw' ,\nFORMAT = 'CSV',\nPARSER_VERSION = '2.0',\nFIELDTERMINATOR = '\\t',\nFIRSTROW = 2,\nFIELDQUOTE = '\"'\n)WITH\n(\ntrip_type SMALLINT 1,\ntrip_type_desc VARCHAR(30) 2\n\n) AS trip ;",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_discovery",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

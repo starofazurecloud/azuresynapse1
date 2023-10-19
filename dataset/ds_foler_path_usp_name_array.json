@@ -1,0 +1,30 @@
+{
+	"name": "ds_foler_path_usp_name_array",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_azuresynapsecoursedl",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "foler_path_usp_name_array.json",
+				"folderPath": "silver",
+				"fileSystem": "nyc-taxi-data"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"folder_path": {
+					"type": "string"
+				},
+				"usp_name": {
+					"type": "string"
+				}
+			}
+		}
+	}
+}

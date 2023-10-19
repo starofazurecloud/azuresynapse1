@@ -1,0 +1,56 @@
+{
+	"name": "23_SendEmailInFailureActivity",
+	"properties": {
+		"activities": [
+			{
+				"name": "Fail1",
+				"type": "Fail",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"message": "It is Intentional Failed",
+					"errorCode": "1001"
+				}
+			},
+			{
+				"name": "Web1",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Fail1",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://lgapp-emailalert-adf.azurewebsites.net:443/api/EmailADF/triggers/When_a_HTTP_request_is_received/invoke?api-version=2022-05-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=3-Z0eJTHKXScveEhStMg7yfqgRM9iA9lXghjDxK8vmo",
+					"connectVia": {
+						"referenceName": "AutoResolveIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "POST",
+					"headers": {
+						"Content-Type": "application/json"
+					},
+					"body": {
+						"value": "{\n\"Pipeline\":\"@{pipeline().Pipeline}\",\n\"ErrorMessage\":\"@{activity('Fail1').Error.Message}\",\n\"DataFactoryName\":\"@{pipeline().DataFactory}\",\n\"ToEmail\":\"starofcloud@outlook.com;starmsahoo@gmail.com\",\n\"Subject\":\"Data Factory Failed at @{utcnow()}\",\n\"FromPersonName\":\"Manoj Sahoo\"\n}\n",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "ADF Practice"
+		},
+		"annotations": []
+	}
+}

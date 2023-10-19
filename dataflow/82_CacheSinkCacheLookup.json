@@ -1,0 +1,166 @@
+{
+	"name": "82_CacheSinkCacheLookup",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "EmployeeSource",
+					"description": "Connect to \" Employee1.csv\" to gent the Max EMP ID"
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "Employee2"
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "countrylookupsource"
+				}
+			],
+			"sinks": [
+				{
+					"name": "cachedMaxEMPID"
+				},
+				{
+					"name": "CachedContryLookup"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_82_employee",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "GetMaxEMPID"
+				},
+				{
+					"name": "selectcolumns"
+				},
+				{
+					"name": "GenerateSurrogateKey"
+				},
+				{
+					"name": "GenerateNewValueforEMPID"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          empid as integer,",
+				"          empname as string,",
+				"          gender as string,",
+				"          country as string,",
+				"          salary as integer",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'demo',",
+				"     fileName: 'Employee1.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> EmployeeSource",
+				"source(output(",
+				"          empname as string,",
+				"          gender as string,",
+				"          country as string,",
+				"          salary as integer",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'demo',",
+				"     fileName: 'Employee2.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> Employee2",
+				"source(output(",
+				"          {country_code } as string,",
+				"          country_name as string",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'demo',",
+				"     fileName: 'ContryLookup.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> countrylookupsource",
+				"EmployeeSource aggregate(groupBy(GETDATE = currentUTC()),",
+				"     maxEmpID = max(empid)) ~> GetMaxEMPID",
+				"GetMaxEMPID select(mapColumn(",
+				"          maxEmpID",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectcolumns",
+				"Employee2 keyGenerate(output(new_col_emp_id as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> GenerateSurrogateKey",
+				"GenerateSurrogateKey derive(emp_id = cachedMaxEMPID#outputs()[1].maxEmpID + new_col_emp_id,",
+				"          country = CachedContryLookup#lookup(country).country_name) ~> GenerateNewValueforEMPID",
+				"GenerateNewValueforEMPID select(mapColumn(",
+				"          empname,",
+				"          gender,",
+				"          country,",
+				"          salary,",
+				"          emp_id",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"selectcolumns sink(validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: false,",
+				"     saveOrder: 0,",
+				"     mapColumn(",
+				"          maxEmpID",
+				"     )) ~> cachedMaxEMPID",
+				"countrylookupsource sink(validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     keys:['country_code '],",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: false,",
+				"     saveOrder: 0,",
+				"     mapColumn(",
+				"          {country_code },",
+				"          country_name",
+				"     )) ~> CachedContryLookup",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}

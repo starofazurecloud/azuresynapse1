@@ -1,0 +1,35 @@
+{
+	"name": "11_SCD_Type1",
+	"properties": {
+		"activities": [
+			{
+				"name": "DF_SCDType1",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "11_DF_SCDType1",
+						"type": "DataFlowReference"
+					},
+					"integrationRuntime": {
+						"referenceName": "AutoResolveIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "ADF Practice"
+		},
+		"annotations": []
+	}
+}

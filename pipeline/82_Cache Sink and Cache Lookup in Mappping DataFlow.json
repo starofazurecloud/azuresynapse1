@@ -1,0 +1,35 @@
+{
+	"name": "82_Cache Sink and Cache Lookup in Mappping DataFlow",
+	"properties": {
+		"activities": [
+			{
+				"name": "82_CacheSinkandCacheLookup",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "82_CacheSinkCacheLookup",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "ADF Practice/Azure Data Factory"
+		},
+		"annotations": []
+	}
+}

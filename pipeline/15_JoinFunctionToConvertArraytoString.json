@@ -1,0 +1,107 @@
+{
+	"name": "15_JoinFunctionToConvertArraytoString",
+	"properties": {
+		"activities": [
+			{
+				"name": "LookupEmployeeFIle",
+				"description": "Lookup to \"demo/Employee.txt\" to get the  EMPNAME Only",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"dataset": {
+						"referenceName": "ds_Employee",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "LoopThruAllEMPNames",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "LookupEmployeeFIle",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('LookupEmployeeFIle').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "AppendToArrayVariable",
+							"description": "Append to Array Variable",
+							"type": "AppendVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "varEmpNamesArray",
+								"value": {
+									"value": "@item().EMPNAME",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "ArraytoString",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "LoopThruAllEMPNames",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "varEpNames",
+					"value": {
+						"value": "@join(variables('varEmpNamesArray'),';')",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"varEmpNamesArray": {
+				"type": "Array"
+			},
+			"varEpNames": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "ADF Practice"
+		},
+		"annotations": []
+	}
+}

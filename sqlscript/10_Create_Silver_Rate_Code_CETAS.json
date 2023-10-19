@@ -1,0 +1,20 @@
+{
+	"name": "10_Create_Silver_Rate_Code_CETAS",
+	"properties": {
+		"folder": {
+			"name": "1_NYC_Taxi/2_ldw"
+		},
+		"content": {
+			"query": "USE nyc_taxi_ldw;\nGO\n\n------------------------------------------------------------\n-- External Table Name :  silver.vendor using CETAS\n------------------------------------------------------------\n\nIF OBJECT_ID('silver.rate_code') IS NOT NULL\n    DROP EXTERNAL TABLE silver.rate_code\nGO\n\nCREATE EXTERNAL TABLE silver.rate_code\nWITH(\n        DATA_SOURCE = nyc_taxi_src\n        ,LOCATION = 'silver/rate_code'\n        ,FILE_FORMAT = parquet_file_format,\n\n)\nAS\nSELECT *\nFROM bronze.vw_rate_code\n\nGO\n\nSELECT *\nFROM silver.rate_code\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_ldw",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

@@ -1,0 +1,160 @@
+{
+	"name": "26_Download_Zip_File_From_API",
+	"properties": {
+		"description": "Download the Zip File from an API , Unzip it and store it in ADLS Gen 2 .\n\nThe Challenge here is we can't unzip the file directly . Microsoft Suggests \n\n1. Download the Zip File to a Staging Folder using copy activity\n\n2. Then use another copy activity to copy from Staging Folder , UnZip it and save it in the Storage Account.\n\nActivities Used :\n\n1. Set Variable : To Create the Staging Folder Name . It's a Dynamic Name with Date & Time Combined\n\n2. 1st Copy : To copy the Zip file from API to Staging Fodler\n\n3. 2nd Copy : To Copy From Staging Folder , unzip it and save it in ADLS Gen 2 Account.\n\nAPI Used here: https://data.gov.au/data/dataset/5bd7fcab-e315-42cb-8daf-50b7efc2027e/resource/0ae4d427-6fa8-4d40-8e76-c6909b5a071b/download/public_split_1_10.zip\n\n\n\n\n\n",
+		"activities": [
+			{
+				"name": "Copy Zip From API to Staging ADLS Gen2",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Set Target Folder Name",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "BinarySource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET"
+						},
+						"formatSettings": {
+							"type": "BinaryReadSettings"
+						}
+					},
+					"sink": {
+						"type": "BinarySink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_HTTP_Zip",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_Binary_Zip",
+						"type": "DatasetReference",
+						"parameters": {
+							"parTargetFolderName": {
+								"value": "26_Download_Zip_File_From_API/Staging/@{variables('varTargetFolderName')}",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy From Staging to Final",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Copy Zip From API to Staging ADLS Gen2",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "BinarySource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"wildcardFileName": "*.zip.zip",
+							"deleteFilesAfterCompletion": false
+						},
+						"formatSettings": {
+							"type": "BinaryReadSettings",
+							"compressionProperties": {
+								"type": "ZipDeflateReadSettings",
+								"preserveZipFileNameAsFolder": false
+							}
+						}
+					},
+					"sink": {
+						"type": "BinarySink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_Source_Zip_Binary",
+						"type": "DatasetReference",
+						"parameters": {
+							"parSourceFolderName": {
+								"value": "@variables('varTargetFolderName')",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_Target_Binary_Unzipped",
+						"type": "DatasetReference",
+						"parameters": {
+							"parTargetFolderName": {
+								"value": "@variables('varTargetFolderName')",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "Set Target Folder Name",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "varTargetFolderName",
+					"value": {
+						"value": "@formatDateTime(utcnow(),'yyyy-MM-dd HH:mm:ss')",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"varTargetFolderName": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "ADF Practice"
+		},
+		"annotations": []
+	}
+}

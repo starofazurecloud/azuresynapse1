@@ -1,0 +1,20 @@
+{
+	"name": "13_Simple_Transformation",
+	"properties": {
+		"folder": {
+			"name": "1_NYC_Taxi/1_Discovery"
+		},
+		"content": {
+			"query": "USE nyc_taxi_discovery\nGO\n\n------------------------------------------------------------------\n-- Number of Trips Made by duration in hours\n------------------------------------------------------------------\n\nSELECT top 100\n     DATEDIFF(MINUTE,lpep_pickup_datetime,lpep_dropoff_datetime) / 60 AS from_hour\n    ,(DATEDIFF(MINUTE,lpep_pickup_datetime,lpep_dropoff_datetime) / 60)  + 1 AS to_hour \n    ,COUNT(1) AS number_of_trips\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'PARQUET'\n    ) AS trip_data\nGROUP BY DATEDIFF(MINUTE,lpep_pickup_datetime,lpep_dropoff_datetime) / 60 \n    ,(DATEDIFF(MINUTE,lpep_pickup_datetime,lpep_dropoff_datetime) / 60)  + 1\n\nORDER BY from_hour , to_hour\n\n\n\n------------------------------------------------------------------\n-- Number of Trips Made by duration in hours for whole period\n------------------------------------------------------------------\n\nSELECT top 100\n     DATEDIFF(MINUTE,lpep_pickup_datetime,lpep_dropoff_datetime) / 60 AS from_hour\n    ,(DATEDIFF(MINUTE,lpep_pickup_datetime,lpep_dropoff_datetime) / 60)  + 1 AS to_hour \n    ,COUNT(1) AS number_of_trips\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/**',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'PARQUET'\n    ) AS trip_data\nGROUP BY DATEDIFF(MINUTE,lpep_pickup_datetime,lpep_dropoff_datetime) / 60 \n    ,(DATEDIFF(MINUTE,lpep_pickup_datetime,lpep_dropoff_datetime) / 60)  + 1\n\nORDER BY from_hour , to_hour\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_discovery",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

@@ -1,0 +1,39 @@
+{
+	"name": "35_2_Compare_Source_Target_MDF",
+	"properties": {
+		"description": "\nThis is Approach No - 2 by using Join , Filter , Hashkey with selected columns \n\ncompare Source File with Target File .\n\nOnly Write UnMatched Lines to New File",
+		"activities": [
+			{
+				"name": "Data flow1",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "DF_35_2_Compare_Source_Target_MDF",
+						"type": "DataFlowReference",
+						"parameters": {
+							"parTargetFolder": "'35_Compare_Source_Target_MDF_2'"
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "ADF Practice"
+		},
+		"annotations": []
+	}
+}

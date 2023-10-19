@@ -1,0 +1,140 @@
+{
+	"name": "4_1_pl_create_silver_trip_data_green_With Script_Activity",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get Trip Year and Month",
+				"type": "Script",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "ls_serverless_sql_pool_db_nyc_taxi_ldw",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "use nyc_taxi_ldw\n\nselect DISTINCT year,month from bronze.vw_trip_data_green_csv"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			},
+			{
+				"name": "ForEach Year and Month",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get Trip Year and Month",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get Trip Year and Month').output.resultSets[0].rows",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Delete Partition",
+							"type": "Delete",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "ds_nyc_taxi_data_dynamic",
+									"type": "DatasetReference",
+									"parameters": {
+										"p_folder_path": {
+											"value": "silver/trip_data_green/year=@{item().year}/month=@{item().month}",
+											"type": "Expression"
+										}
+									}
+								},
+								"enableLogging": false,
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								}
+							}
+						},
+						{
+							"name": "Create Trip Data Table",
+							"type": "Script",
+							"dependsOn": [
+								{
+									"activity": "Delete Partition",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "ls_serverless_sql_pool_db_nyc_taxi_ldw",
+								"type": "LinkedServiceReference"
+							},
+							"typeProperties": {
+								"scripts": [
+									{
+										"parameters": [
+											{
+												"name": "year",
+												"type": "String",
+												"value": {
+													"value": "@item().year",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											},
+											{
+												"name": "month",
+												"type": "String",
+												"value": {
+													"value": "@item().month",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											}
+										],
+										"type": "NonQuery",
+										"text": "EXEC silver.usp_silver_trip_data_green @year = @year, @month =@month"
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
+						}
+					]
+				}
+			}
+		],
+		"annotations": []
+	}
+}

@@ -1,0 +1,321 @@
+{
+	"name": "19_Execute Stored Procedure with output Parameters",
+	"properties": {
+		"description": "When Your SQL Stored Procedures return some values after execution then , Stored Procedure Activity will not help .\n\nYou will have to use \"lookup activity\" with\nquery options in the setting tab of lookup activity .\n\nlookup1 : it returns empcount by country ( used query option )\n\nlookup2 : to get all employee details \n(used stored procedure option )\n\nforeach : it will loop thru the records of loop2 activity output and insert into \"dimEmployee\" Table using script activity\n\n\nExample :\n------------------------------------\n\nThis Procedure return no of employees for the country . Data used in this procedure\n\nempKey\tempid\tempname\tgender\tcountry\tsalary\tisActive\tstartDate\n1\t1001\tAlex\tMale\tIndia\t5000\t1\t2023-06-28T10:51:56.8270000\n\n\n2\t1002\tNicolas\tFemale\tIndia\t9800\t1\t2023-06-28T10:52:34.1230000\n\n\n3\t1003\tJames\tMale\tEngland\t8855\t1\t2023-06-28T10:53:04.7330000\n\n\n4\t1004\tCummins\tMale\tAustralia\t8455\t1\t2023-06-28T10:53:29.4870000\n\n\n5\t1005\tWarner\tFemale\tAustralia\t4785\t1\t2023-06-28T10:53:53.7300000\n\n\n\n\n\n ",
+		"activities": [
+			{
+				"name": "Stored procedure1",
+				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[getEmployeeDetails]",
+					"storedProcedureParameters": {
+						"country": {
+							"value": "India",
+							"type": "String"
+						},
+						"empCount": {
+							"value": "",
+							"type": "Int32"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSQLDB",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Lookup1 to Execute getEmployeeCountByCountry",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "Script To Truncate dimEpmloyee Table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "declare @empCount int\nexec getEmployeeCountByCountry @country = 'India' , @empCount =@empCount OUTPUT\nselect @empCount as empCount \n",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_AzureSQLDB",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Lookup2 to execute getEmployeeDetails Procedure",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "Lookup1 to Execute getEmployeeCountByCountry",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[dbo].[getEmployeeDetails]",
+						"storedProcedureParameters": {
+							"country": {
+								"type": "String",
+								"value": "India"
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_AzureSQLDB",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEachEmployee",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup2 to execute getEmployeeDetails Procedure",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup2 to execute getEmployeeDetails Procedure').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Script1",
+							"type": "Script",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "ls_AzureSQLDB",
+								"type": "LinkedServiceReference"
+							},
+							"typeProperties": {
+								"scripts": [
+									{
+										"parameters": [
+											{
+												"name": "empKey",
+												"type": "Int32",
+												"value": {
+													"value": "@item().empKey",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											},
+											{
+												"name": "empid",
+												"type": "Int32",
+												"value": {
+													"value": "@item().empid",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											},
+											{
+												"name": "empname",
+												"type": "String",
+												"value": {
+													"value": "@item().empname",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											},
+											{
+												"name": "gender",
+												"type": "String",
+												"value": {
+													"value": "@item().gender",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											},
+											{
+												"name": "country",
+												"type": "String",
+												"value": {
+													"value": "@item().country",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											},
+											{
+												"name": "salary",
+												"type": "Int32",
+												"value": {
+													"value": "@item().salary",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											},
+											{
+												"name": "isActive",
+												"type": "Int32",
+												"value": {
+													"value": "@item().isActive",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											},
+											{
+												"name": "startDate",
+												"type": "Datetime",
+												"value": {
+													"value": "@item().startDate",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											},
+											{
+												"name": "endDate",
+												"type": "Datetime",
+												"value": {
+													"value": "@item().endDate",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											}
+										],
+										"type": "NonQuery",
+										"text": "insert into dbo.dimEmployee (empKey,empid,empname,gender,country,salary,isActive,startDate,endDate)\nvalues (@empKey,@empid,@empname,@gender,@country,@salary,@isActive,@startDate,@endDate)"
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Script To Execute getDimEmployeeDetails",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "ForEachEmployee",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSQLDB",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"parameters": [
+								{
+									"name": "country",
+									"type": "String",
+									"value": "India",
+									"direction": "Input"
+								}
+							],
+							"type": "Query",
+							"text": "exec getdimEmployeeDetails @country = @country"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			},
+			{
+				"name": "Script To Truncate dimEpmloyee Table",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "Stored procedure1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSQLDB",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "NonQuery",
+							"text": "TRUNCATE TABLE dimEmployee"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			}
+		],
+		"folder": {
+			"name": "ADF Practice"
+		},
+		"annotations": []
+	}
+}

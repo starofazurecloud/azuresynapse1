@@ -1,0 +1,146 @@
+{
+	"name": "37_2_DayName_Of_LastDay_of_PreviousMonth",
+	"properties": {
+		"activities": [
+			{
+				"name": "If WeekDay is Holiday",
+				"type": "IfCondition",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [
+					{
+						"activity": "Set DayOfWeek",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@or(equals(dayOfWeek(utcnow()),0),equals(dayOfWeek(utcnow()),6))",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Wait1 for 2 Sec as NOT Weekend",
+							"type": "Wait",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 2
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Wait1 for 1 Sec as Weekend",
+							"type": "Wait",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 1
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Set DayOfWeek",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "varDayofWeek",
+					"value": {
+						"value": "@if(equals(dayOfWeek(variables('varDayName')),0),'Sunday'\r\n    ,if(equals(dayOfWeek(variables('varDayName')),1),'Monday'\r\n    ,if(equals(dayOfWeek(variables('varDayName')),2),'Tuesday'\r\n    ,if(equals(dayOfWeek(variables('varDayName')),3),'Wednesday'\r\n    ,if(equals(dayOfWeek(variables('varDayName')),4),'Thursday'\r\n    ,if(equals(dayOfWeek(variables('varDayName')),5),'Friday'\r\n    ,'Saturday'))))))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "If WeekDay is Holiday Opt 2",
+				"type": "IfCondition",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [
+					{
+						"activity": "Set DayOfWeek",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@contains('06', string(dayOfWeek(utcNow())))",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Wait1 for 2 Sec as NOT Weekend_copy1",
+							"type": "Wait",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 2
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Wait1 for 1 Sec as Weekend_copy1",
+							"type": "Wait",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 1
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "varDayName",
+					"value": {
+						"value": "@string( addDays(utcnow(), mul(dayOfMonth(utcNow()),-1))     )",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"varDayofWeek": {
+				"type": "String"
+			},
+			"varDayName": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "ADF Practice"
+		},
+		"annotations": []
+	}
+}

@@ -1,0 +1,69 @@
+{
+	"name": "11_DF_SCDType1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "SourceToEmployee",
+					"description": "Connet to \"demo/Employee.txt\""
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_AzureSQLDB",
+						"type": "LinkedServiceReference"
+					},
+					"name": "WriteToDB",
+					"description": "Write to \"azuresynapsesqlsrv /synapsedev / dbo.Employee\""
+				}
+			],
+			"transformations": [
+				{
+					"name": "AlterTheRows",
+					"description": "Alter the Rows to allow UPsert"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EMPID as integer,",
+				"          EMPNAME as string,",
+				"          AGE as integer,",
+				"          COUNTRY as string,",
+				"          SALARY as integer",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'demo',",
+				"     fileName: 'Employee.txt',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> SourceToEmployee",
+				"SourceToEmployee alterRow(upsertIf(true())) ~> AlterTheRows",
+				"AlterTheRows sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'EMPLOYEE',",
+				"     insertable: false,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: true,",
+				"     keys:['EMPID'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> WriteToDB"
+			]
+		}
+	}
+}

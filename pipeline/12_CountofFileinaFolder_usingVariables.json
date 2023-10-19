@@ -1,0 +1,129 @@
+{
+	"name": "12_CountofFileinaFolder_usingVariables",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetFolderInformation",
+				"description": "Get Information About \"demo\" cotainer",
+				"type": "GetMetadata",
+				"dependsOn": [
+					{
+						"activity": "SetStartVariableValue",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "ds_demo",
+						"type": "DatasetReference"
+					},
+					"fieldList": [
+						"childItems"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
+					}
+				}
+			},
+			{
+				"name": "SetStartVariableValue",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "varStart",
+					"value": {
+						"value": "0",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "ForEachFile",
+				"description": "Count the No of Files inside the Folder . If there is a Folder inside the Folder , ignore that Folder",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GetFolderInformation",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GetFolderInformation').output.childItems",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Set variable1",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "Var2",
+								"value": {
+									"value": "@if(equals(item().type,'Folder'),string(add(int(variables('varStart')),0 )),string(add(int(variables('varStart')),1 )))",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set variable2",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Set variable1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "varStart",
+								"value": {
+									"value": "@variables('Var2')",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"varStart": {
+				"type": "String"
+			},
+			"Var2": {
+				"type": "String"
+			},
+			"varFileCount": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "ADF Practice"
+		},
+		"annotations": []
+	}
+}

@@ -1,0 +1,118 @@
+{
+	"name": "10_DF_LogFile_Append",
+	"properties": {
+		"description": "This DataFlow Task will Append Data to LogFIle for logging purpose . Video No 10 .",
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "SampleFileSource",
+					"description": "Connecting to Sample File \"demo/SampleOneValue.csv\" which has one dummy row ."
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "LogFileSource"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "AppendAlltheRequredColumnsForLogging",
+					"description": "Add the Columns for Logging Purpose"
+				},
+				{
+					"name": "RemoveTheDummyColumnFromTheSource",
+					"description": "Remove The Dummy Column Which is coming from the Source"
+				},
+				{
+					"name": "CombineWithLogFileSource"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     ADFName as string,",
+				"     PipeLineName as string,",
+				"     Status as string,",
+				"     RunId as string,",
+				"     TriggerName as string,",
+				"     ExecutedOn as string,",
+				"     FileName as string",
+				"}",
+				"source(output(",
+				"          {_col0_} as string",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'demo',",
+				"     fileName: 'SampleOneValue.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: false) ~> SampleFileSource",
+				"source(useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'demo',",
+				"     folderPath: 'Output/log',",
+				"     fileName: ($FileName),",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> LogFileSource",
+				"SampleFileSource derive(ADFName = $ADFName,",
+				"          PipelineName = $PipeLineName,",
+				"          Status = $Status,",
+				"          RunId = $RunId,",
+				"          TriggerName = $TriggerName,",
+				"          ExecutedOn = $ExecutedOn) ~> AppendAlltheRequredColumnsForLogging",
+				"AppendAlltheRequredColumnsForLogging select(mapColumn(",
+				"          ADFName,",
+				"          PipelineName,",
+				"          Status,",
+				"          RunId,",
+				"          TriggerName,",
+				"          ExecutedOn",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> RemoveTheDummyColumnFromTheSource",
+				"RemoveTheDummyColumnFromTheSource, LogFileSource union(byName: true)~> CombineWithLogFileSource",
+				"CombineWithLogFileSource sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'demo',",
+				"     folderPath: 'Output/log',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     partitionFileNames:[($FileName)],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

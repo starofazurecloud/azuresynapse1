@@ -1,0 +1,53 @@
+{
+	"name": "31_1_Call_Another_ADF_Pipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "Web Call Another ADF Pipeline",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://management.azure.com/subscriptions/1101ab50-b9a6-4719-afe5-7586e598ea9f/resourceGroups/poc-rg/providers/Microsoft.DataFactory/factories/adf-demo-for-all/pipelines/childPipeline/createRun?api-version=2018-06-01",
+					"connectVia": {
+						"referenceName": "AutoResolveIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "POST",
+					"body": {
+						"duration": 20
+					},
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://management.azure.com/"
+					}
+				}
+			}
+		],
+		"variables": {
+			"pipelineRunID": {
+				"type": "String"
+			},
+			"pipelineStatus": {
+				"type": "String"
+			},
+			"varStartCounter": {
+				"type": "String"
+			},
+			"varCounter": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "ADF Practice"
+		},
+		"annotations": []
+	}
+}

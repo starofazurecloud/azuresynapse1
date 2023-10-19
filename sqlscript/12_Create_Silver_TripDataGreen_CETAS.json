@@ -1,0 +1,20 @@
+{
+	"name": "12_Create_Silver_TripDataGreen_CETAS",
+	"properties": {
+		"folder": {
+			"name": "1_NYC_Taxi/2_ldw"
+		},
+		"content": {
+			"query": "USE nyc_taxi_ldw;\nGO\n\n------------------------------------------------------------\n-- External Table Name :  silver.vendor using CETAS\n-- As CETAS Statment won't able to create parition folders so replaced it with Stored Procedure\n------------------------------------------------------------\n/*\nIF OBJECT_ID('silver.trip_data_green') IS NOT NULL\n    DROP EXTERNAL TABLE silver.trip_data_green\nGO\n\nCREATE EXTERNAL TABLE silver.trip_data_green\nWITH(\n        DATA_SOURCE = nyc_taxi_src\n        ,LOCATION = 'silver/trip_data_green'\n        ,FILE_FORMAT = parquet_file_format,\n\n)\nAS\nSELECT *\nFROM bronze.trip_data_green_csv\n\nGO\n\nSELECT top 100 *\nFROM  silver.trip_data_green\n*/\n\nEXEC silver.usp_silver_trip_data_green @year='2020' , @month='01'\nEXEC silver.usp_silver_trip_data_green @year='2020' , @month='02'\nEXEC silver.usp_silver_trip_data_green @year='2020' , @month='03'\nEXEC silver.usp_silver_trip_data_green @year='2020' , @month='04'\nEXEC silver.usp_silver_trip_data_green @year='2020' , @month='05'\nEXEC silver.usp_silver_trip_data_green @year='2020' , @month='06'\nEXEC silver.usp_silver_trip_data_green @year='2020' , @month='07'\nEXEC silver.usp_silver_trip_data_green @year='2020' , @month='08'\nEXEC silver.usp_silver_trip_data_green @year='2020' , @month='09'\nEXEC silver.usp_silver_trip_data_green @year='2020' , @month='10'\nEXEC silver.usp_silver_trip_data_green @year='2020' , @month='11'\nEXEC silver.usp_silver_trip_data_green @year='2020' , @month='12'\n\nEXEC silver.usp_silver_trip_data_green @year='2021' , @month='01'\nEXEC silver.usp_silver_trip_data_green @year='2021' , @month='02'\nEXEC silver.usp_silver_trip_data_green @year='2021' , @month='03'\nEXEC silver.usp_silver_trip_data_green @year='2021' , @month='04'\nEXEC silver.usp_silver_trip_data_green @year='2021' , @month='05'\nEXEC silver.usp_silver_trip_data_green @year='2021' , @month='06'\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_ldw",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

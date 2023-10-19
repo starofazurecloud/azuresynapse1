@@ -1,0 +1,50 @@
+{
+	"name": "36_2_Execute_SQL_Queries_Using_Lookup",
+	"properties": {
+		"description": "Run DDL Commands using SP_EXECUTESQL Command",
+		"activities": [
+			{
+				"name": "Lookup Employee Skills",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "EXEC SP_EXECUTESQL N'CREATE SCHEMA demo';\n\nselect 1 as id",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_SQL_Employee",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			}
+		],
+		"variables": {
+			"varNewName": {
+				"type": "String",
+				"defaultValue": "LivingStone"
+			},
+			"varEmployeeOldName": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "ADF Practice"
+		},
+		"annotations": []
+	}
+}

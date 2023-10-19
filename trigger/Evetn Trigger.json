@@ -1,0 +1,25 @@
+{
+	"name": "Evetn Trigger",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "PL_11_Event_Based_Trigger",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/practice/blobs/input / S_11_Event_Based_Trigger",
+			"blobPathEndsWith": ".txt",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/1101ab50-b9a6-4719-afe5-7586e598ea9f/resourceGroups/synapse-course-rg/providers/Microsoft.Storage/storageAccounts/azuresynapsecoursedl",
+			"events": [
+				"Microsoft.Storage.BlobCreated"
+			]
+		}
+	}
+}

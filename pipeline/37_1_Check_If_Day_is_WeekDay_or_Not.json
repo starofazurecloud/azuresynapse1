@@ -1,0 +1,120 @@
+{
+	"name": "37_1_Check_If_Day_is_WeekDay_or_Not",
+	"properties": {
+		"activities": [
+			{
+				"name": "If WeekDay is Holiday",
+				"type": "IfCondition",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [
+					{
+						"activity": "Set DayOfWeek",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@or(equals(dayOfWeek(utcnow()),0),equals(dayOfWeek(utcnow()),6))",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Wait1 for 2 Sec as NOT Weekend",
+							"type": "Wait",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 2
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Wait1 for 1 Sec as Weekend",
+							"type": "Wait",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 1
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Set DayOfWeek",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "varDayofWeek",
+					"value": {
+						"value": "@if(equals(dayOfWeek(utcnow()),0),'Sunday'\n,if(equals(dayOfWeek(utcnow()),1),'Monday'\n,if(equals(dayOfWeek(utcnow()),2),'Tuesday'\n,if(equals(dayOfWeek(utcnow()),3),'Wednesday'\n,if(equals(dayOfWeek(utcnow()),4),'Thursday'\n,if(equals(dayOfWeek(utcnow()),5),'Friday'\n,'Saturday'))))))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "If WeekDay is Holiday Opt 2",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Set DayOfWeek",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@contains('06', string(dayOfWeek(utcNow())))",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Wait1 for 2 Sec as NOT Weekend_copy1",
+							"type": "Wait",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 2
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Wait1 for 1 Sec as Weekend_copy1",
+							"type": "Wait",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 1
+							}
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"varDayofWeek": {
+				"type": "String"
+			},
+			"varDayName": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "ADF Practice"
+		},
+		"annotations": []
+	}
+}

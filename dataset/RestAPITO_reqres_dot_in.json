@@ -1,0 +1,23 @@
+{
+	"name": "RestAPITO_reqres_dot_in",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "RestService1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"parPageNo": {
+				"type": "int"
+			}
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "/api/users?page=@{dataset().parPageNo}",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	}
+}

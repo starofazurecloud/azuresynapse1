@@ -1,0 +1,70 @@
+{
+	"name": "DF_28_TimeZone_Conversion_In_MDF",
+	"properties": {
+		"description": "Using this MDF , we will convert UTC Time to IST Time .",
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "EnglanCricktersEntryTime"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_demo_output_directory",
+						"type": "DatasetReference"
+					},
+					"name": "writeToFolder"
+				}
+			],
+			"transformations": [
+				{
+					"name": "ConvertEntryDatetoIST"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     parFolderName as string ('28_TimeZone_Conversion_in_MDF'),",
+				"     parFileName as string ('EnglandCricketersEntryTiing.csv')",
+				"}",
+				"source(output(",
+				"          Name as string,",
+				"          Age as short,",
+				"          EntryDate as string",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'demo',",
+				"     folderPath: ($parFolderName),",
+				"     fileName: ($parFileName),",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     multiLineRow: true) ~> EnglanCricktersEntryTime",
+				"EnglanCricktersEntryTime derive(EntryDateTime_IST = fromUTC(toTimestamp(EntryDate,'yyyy-MM-dd HH:mm:ss'),'IST')) ~> ConvertEntryDatetoIST",
+				"ConvertEntryDatetoIST sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          Name,",
+				"          Age,",
+				"          EntryDate,",
+				"          EntryDateTime_IST",
+				"     )) ~> writeToFolder"
+			]
+		}
+	}
+}

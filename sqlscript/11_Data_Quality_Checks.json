@@ -1,0 +1,20 @@
+{
+	"name": "11_Data_Quality_Checks",
+	"properties": {
+		"folder": {
+			"name": "1_NYC_Taxi/1_Discovery"
+		},
+		"content": {
+			"query": "USE nyc_taxi_discovery\nGO\n\n--------------------------------------\n-- Identify Data Quality Issues in trip_amount\n--------------------------------------\n\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n\n--------------------------------------\n--\n--------------------------------------\nSELECT\n     MIN(total_amount) AS min_total_amount\n    ,MAX(total_amount) AS max_total_amount\n    ,COUNT(1) AS total_number_of_records\n    ,COUNT(total_amount) AS not_null_total_number_of_records\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'PARQUET'\n    ) AS [result]   \n\n--------------------------------------\n--\n--------------------------------------\nSELECT  payment_type , COUNT(1) AS number_of_records\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'PARQUET'\n    ) AS [result]   \n    --WHERE total_amount < 0\n    GROUP BY payment_type\n    ORDER BY payment_type\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_discovery",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

@@ -1,0 +1,77 @@
+{
+	"name": "DF_Convert_TablularData_To_NestedJson",
+	"properties": {
+		"folder": {
+			"name": "AzureContent"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "cast1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          id as short,",
+				"          name as string,",
+				"          type as string,",
+				"          value as string",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'demo',",
+				"     folderPath: '35_ByAnnu_ConvertTablularDatatoNestedJson',",
+				"     fileName: 'ConvertTablularDatatoNestedJson.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> source1",
+				"source1 aggregate(groupBy(id,",
+				"          name),",
+				"     typeData = keyValues(collect(byName(\"type\")),collect(byName(\"value\")))) ~> aggregate1",
+				"aggregate1 cast(output(",
+				"          id as string",
+				"     ),",
+				"     errors: true) ~> cast1",
+				"cast1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'json',",
+				"     fileSystem: 'demo',",
+				"     folderPath: 'Output/35_ByAnnu_ConvertTablularDatatoNestedJson',",
+				"     truncate: true,",
+				"     partitionFileNames:['ConvertedtoJson.json'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

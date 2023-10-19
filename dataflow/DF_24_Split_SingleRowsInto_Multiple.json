@@ -1,0 +1,67 @@
+{
+	"name": "DF_24_Split_SingleRowsInto_Multiple",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_demo_input_directory_file",
+						"type": "DatasetReference"
+					},
+					"name": "SourceToEnglandCricketersSkills"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_demo_output_directory",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "ConvertSkillColumntoArray"
+				},
+				{
+					"name": "FlattenArrayColumn"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Name as string,",
+				"          Age as string,",
+				"          Skill as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> SourceToEnglandCricketersSkills",
+				"SourceToEnglandCricketersSkills derive(SkillArray = split(Skill,\",\")) ~> ConvertSkillColumntoArray",
+				"ConvertSkillColumntoArray foldDown(unroll(SkillArray),",
+				"     mapColumn(",
+				"          Name,",
+				"          Age,",
+				"          Skill,",
+				"          SkillType = SkillArray",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> FlattenArrayColumn",
+				"FlattenArrayColumn sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          Name,",
+				"          Age,",
+				"          Skill,",
+				"          SkillType",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}

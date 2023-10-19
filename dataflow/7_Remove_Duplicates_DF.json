@@ -1,0 +1,102 @@
+{
+	"name": "7_Remove_Duplicates_DF",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "EmpSource",
+					"description": "Employee Dataset Source"
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "EmpNewSource"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "WritetoOutputFolder",
+					"description": "Write to Output/UniqueEmpoyees Folder"
+				}
+			],
+			"transformations": [
+				{
+					"name": "UnionEmpSrcAndEmpNewSrc",
+					"description": "Combining rows from transformation EmpSource and EmpNewSource"
+				},
+				{
+					"name": "RemoveDuplicates",
+					"description": "Remove Duplicates based on EMPID Column and keep First Row as unique Row."
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EMPID as string,",
+				"          EMPNAME as string,",
+				"          AGE as string,",
+				"          COUNTRY as string,",
+				"          SALARY as string",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'demo',",
+				"     fileName: 'Employee.txt',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> EmpSource",
+				"source(output(",
+				"          EMPID as string,",
+				"          EMPNAME as string,",
+				"          AGE as string,",
+				"          COUNTRY as string,",
+				"          SALARY as string",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'demo',",
+				"     fileName: 'EmployeeNew.txt',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> EmpNewSource",
+				"EmpSource, EmpNewSource union(byName: true)~> UnionEmpSrcAndEmpNewSrc",
+				"UnionEmpSrcAndEmpNewSrc aggregate(groupBy(EMPID),",
+				"     each(match(name !=\"EMPID\"), $$ = first($$))) ~> RemoveDuplicates",
+				"RemoveDuplicates sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'demo',",
+				"     folderPath: 'Output/UniqueEmpoyees',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     partitionFileNames:['EmployeeUnique.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> WritetoOutputFolder"
+			]
+		}
+	}
+}

@@ -1,0 +1,20 @@
+{
+	"name": "13_Create_Silver_Views",
+	"properties": {
+		"folder": {
+			"name": "1_NYC_Taxi/2_ldw"
+		},
+		"content": {
+			"query": "\nUSE nyc_taxi_ldw;\nGO\n\nDROP VIEW IF EXISTS silver.vw_trip_data_green\nGO\n\nCREATE VIEW silver.vw_trip_data_green\nAS\n    SELECT\n        \n        --result.filename() as file_name,\n        result.filepath(1) as year, -- 1 here is Position of WildCard  \n        result.filepath(2) as month, -- 2 here is Position of WildCard \n        result.filepath(3) as filename_from_file_path, -- 3 here is Position of WildCard \n        result.*\n    FROM\n        OPENROWSET(\n            BULK '/silver/trip_data_green/year=*/month=*/*.parquet' ,\n            DATA_SOURCE = 'nyc_taxi_src',\n            FORMAT = 'PARQUET'\n        )WITH(\n             vendor_id\tint\n            ,lpep_pickup_datetime\tdatetime2(7)\n            ,lpep_dropoff_datetime\tdatetime2(7)\n            ,store_and_fwd_flag\tCHAR(1)\n            ,rate_code_id\tint\n            ,pu_location_id\tint\n            ,do_location_id\tint\n            ,passenger_count\tint\n            ,trip_distance\tfloat\n            ,fare_amount\tfloat\n            ,extra\tfloat\n            ,mta_tax\tfloat\n            ,tip_amount\tfloat\n            ,tolls_amount\tfloat\n            ,ehail_fee\tint\n            ,improvement_surcharge\tfloat\n            ,total_amount\tfloat\n            ,payment_type\tint\n            ,trip_type\tint\n            ,congestion_surcharge\tfloat\n            ) AS [result] \n        \nGO\n\n\nSELECT  year,month,COUNT(1) AS record_count FROM silver.vw_trip_data_green\nGROUP BY year,month\nORDER BY 1,2\n\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_ldw",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

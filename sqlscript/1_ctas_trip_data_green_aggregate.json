@@ -1,0 +1,20 @@
+{
+	"name": "1_ctas_trip_data_green_aggregate",
+	"properties": {
+		"folder": {
+			"name": "1_NYC_Taxi/3_dwh_dedicated_sql_pool"
+		},
+		"content": {
+			"query": "\nCREATE SCHEMA staging\nGO\n\n---- CReate a Dedicated SQL Pool and run the below commands\n\nIF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'parquet_file_format') \n\tCREATE EXTERNAL FILE FORMAT [parquet_file_format] \n\tWITH ( FORMAT_TYPE = PARQUET)\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'nyc_taxi_data_src') \n\tCREATE EXTERNAL DATA SOURCE nyc_taxi_data_src\n\tWITH (\n\t\tLOCATION = 'abfss://nyc-taxi-data@azuresynapsecoursedl.dfs.core.windows.net' \n\t)\nGO\n\nCREATE EXTERNAL TABLE staging.ext_trip_data_green_agg (\n\t[pu_location_id] int,\n\t[do_location_id] int,\n\t[total_trip_count] bigint,\n\t[total_fare_amount] float\n\t)\n\tWITH (\n\tLOCATION = 'gold/trip_data_green_agg',\n\tDATA_SOURCE = nyc_taxi_data_src,\n\tFILE_FORMAT = parquet_file_format\n\t)\nGO\n\n\nSELECT TOP 100 * FROM staging.ext_trip_data_green_agg\nGO\n\n\nCREATE SCHEMA dwh\n\nGO\n\nCREATE TABLE dwh.trip_data_green_agg\nWITH(\n\t\tCLUSTERED COLUMNSTORE INDEX ,\n\t\tDISTRIBUTION =ROUND_ROBIN\n\n)\nAS SELECT * FROM staging.ext_trip_data_green_agg\n\n\nGO\n\nSELECT * FROM dwh.trip_data_green_agg\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_data_dedicated",
+				"poolName": "nyc_taxi_data_dedicated"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

@@ -1,0 +1,85 @@
+{
+	"name": "27_Round_Decimal_Number_Pipeline_Expression",
+	"properties": {
+		"description": "Question :\n\n\n\nInput is 123.33421 : Output : 123.33\nInput is 123.31621 : Output : 123.32\nInput is 123.1  : Output : 123.10 \n\n\nSolution  1:\nSet variable using substring\n\nSplit the input value , if the 3rd digit is >= 5 then add 1 else keep as it is .\n\nSolution 2 :\n\nMultiply 100 to the original number , Split it and divide 100 to it again.\n\n",
+		"activities": [
+			{
+				"name": "Set Variable",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "varInput",
+					"value": {
+						"value": "@concat('123.34331','000000000000')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set variable using Multiplier",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set Variable",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "varCalculate",
+					"value": {
+						"value": "@string(div(float(split(string(mul(float(variables('varInput')),100)),'.')[0]),100.00))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set variable using substring",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set Variable",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "varCalculate",
+					"value": {
+						"value": "@concat(\n            split(variables('varInput'),'.')[0],\n            '.', \n        if( greaterOrEquals(int(substring(split(variables('varInput'),'.')[1],2 ,1)),5), \n                string(add(int( substring(split(variables('varInput'),'.')[1],0 ,2)),1)),\n                substring(split(variables('varInput'),'.')[1],0 ,2)\n          )\n        )",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"varInput": {
+				"type": "String"
+			},
+			"varCalculate": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "ADF Practice"
+		},
+		"annotations": []
+	}
+}

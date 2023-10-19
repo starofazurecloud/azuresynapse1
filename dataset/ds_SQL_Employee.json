@@ -1,0 +1,12 @@
+{
+	"name": "ds_SQL_Employee",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureSQL_SampleDB",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}

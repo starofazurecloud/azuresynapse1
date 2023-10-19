@@ -1,0 +1,141 @@
+{
+	"name": "30_1_Dynamic_Capture_Error_Message",
+	"properties": {
+		"description": "\nScenario:\n+++++++++++\n\nCapture error message of activity .\nThese activities are running in parallel.\nIf any activity fails , then capture the message\n\n\nactivity('Set Variable1').Error?.message\n\nactivity('Set Variable1')?.Error?.message\n\nQuestion Mark ( ? ) next to Activity  : This is required for NULL Safe .\nThis wont throw error if the activity hasn't run\n\n\nQuestion Mark ( ? ) next to Property which is  Error here:\nThis wont throw error if the activity doesn't have any error.",
+		"activities": [
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "var1",
+					"value": "b"
+				}
+			},
+			{
+				"name": "Set variable3",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "var1",
+					"value": {
+						"value": "@int('1')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set variable2",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "var1",
+					"value": "a"
+				}
+			},
+			{
+				"name": "Wait1",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Set variable2",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Set variable3",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 1
+				}
+			},
+			{
+				"name": "Get Error Message",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Wait1",
+						"dependencyConditions": [
+							"Skipped"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "var1",
+					"value": {
+						"value": "@concat(activity('Set Variable1').Error?.message,'|' , activity('Set Variable2').Error?.message,'|' , activity('Set Variable3').Error?.message)",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set variable4 If Previous Activity Skipped",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Wait1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "varActivityStatus",
+					"value": {
+						"value": "@coalesce(activity('Wait1')?.activitytype,'Skipped')",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"var1": {
+				"type": "String"
+			},
+			"varActivityStatus": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "ADF Practice"
+		},
+		"annotations": []
+	}
+}
