@@ -1,0 +1,54 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"value": "synapse-course-workspace"
+		},
+		"ls_AzureSQLDB_connectionString": {
+			"value": ""
+		},
+		"ls_AzureSQL_SampleDB_connectionString": {
+			"value": ""
+		},
+		"ls_cosmos_nyc_taxi_data_connectionString": {
+			"value": ""
+		},
+		"ls_serverless_sql_pool_db_nyc_taxi_ldw_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synapse-course-workspace-ondemand.sql.azuresynapse.net,1433;Initial Catalog=nyc_taxi_ldw"
+		},
+		"synapse-course-workspace-WorkspaceDefaultSqlServer_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synapse-course-workspace.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"RestService1_properties_typeProperties_url": {
+			"value": "https://reqres.in"
+		},
+		"bing-covid-19-data_sasUri": {
+			"value": ""
+		},
+		"ls_HTTP_FIleExample_properties_typeProperties_url": {
+			"value": "https://data.gov.au/"
+		},
+		"ls_RESTAPI_properties_typeProperties_url": {
+			"value": "https://sample-videos.com/"
+		},
+		"ls_azuresynapsecoursedl_properties_typeProperties_url": {
+			"value": "https://azuresynapsecoursedl.dfs.core.windows.net/"
+		},
+		"ls_http_properties_typeProperties_url": {
+			"value": "https://sample-videos.com"
+		},
+		"synapse-course-workspace-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://azuresynapsecoursedl.dfs.core.windows.net"
+		},
+		"Evetn Trigger_properties_PL_11_Event_Based_Trigger_parameters_sourcePath": {
+			"value": "@triggerBody().folderPath"
+		},
+		"Evetn Trigger_properties_PL_11_Event_Based_Trigger_parameters_sourceFileName": {
+			"value": "@triggerBody().fileName"
+		},
+		"Evetn Trigger_properties_typeProperties_scope": {
+			"value": "/subscriptions/1101ab50-b9a6-4719-afe5-7586e598ea9f/resourceGroups/synapse-course-rg/providers/Microsoft.Storage/storageAccounts/azuresynapsecoursedl"
+		}
+	}
+}
