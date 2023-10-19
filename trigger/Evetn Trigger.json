@@ -8,6 +8,10 @@
 				"pipelineReference": {
 					"referenceName": "PL_11_Event_Based_Trigger",
 					"type": "PipelineReference"
+				},
+				"parameters": {
+					"sourcePath": "@triggerBody().folderPath",
+					"sourceFileName": "@triggerBody().fileName"
 				}
 			}
 		],

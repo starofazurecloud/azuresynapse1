@@ -12,6 +12,14 @@
 				}
 			}
 		],
+		"parameters": {
+			"sourcePath": {
+				"type": "string"
+			},
+			"sourceFileName": {
+				"type": "string"
+			}
+		},
 		"folder": {
 			"name": "ADF_Practice_2"
 		},
