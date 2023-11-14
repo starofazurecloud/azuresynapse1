@@ -5,12 +5,20 @@
 			"referenceName": "ls_azuresynapsecoursedl",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"parDataSetFileName": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "DailySales.csv",
+				"fileName": {
+					"value": "@dataset().parDataSetFileName",
+					"type": "Expression"
+				},
 				"folderPath": "input/VideoNo27_Daily_or_Hourly_Files",
 				"fileSystem": "practice"
 			},

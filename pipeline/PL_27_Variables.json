@@ -140,7 +140,10 @@
 							"inputs": [
 								{
 									"referenceName": "ds_27_DailyorHourly_CSV_File",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"parDataSetFileName": "HourlySales.csv"
+									}
 								}
 							],
 							"outputs": [
@@ -258,7 +261,10 @@
 							"inputs": [
 								{
 									"referenceName": "ds_27_DailyorHourly_CSV_File",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"parDataSetFileName": "DailySales.csv"
+									}
 								}
 							],
 							"outputs": [
