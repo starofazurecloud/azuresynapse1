@@ -20,6 +20,9 @@
 		"synapse-course-workspace-WorkspaceDefaultSqlServer_connectionString": {
 			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synapse-course-workspace.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
+		"ls_ADF_DEMO_SQL_SVR_connectionString": {
+			"value": ""
+		},
 		"RestService1_properties_typeProperties_url": {
 			"value": "https://reqres.in"
 		},
@@ -40,6 +43,9 @@
 		},
 		"synapse-course-workspace-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"value": "https://azuresynapsecoursedl.dfs.core.windows.net"
+		},
+		"Evetn Trigger_properties_PL_27_Variables_parameters_parFileName": {
+			"value": "@trigger().outputs.body.fileName"
 		},
 		"Evetn Trigger_properties_typeProperties_scope": {
 			"value": "/subscriptions/1101ab50-b9a6-4719-afe5-7586e598ea9f/resourceGroups/synapse-course-rg/providers/Microsoft.Storage/storageAccounts/azuresynapsecoursedl"
