@@ -22,7 +22,7 @@
 		],
 		"type": "BlobEventsTrigger",
 		"typeProperties": {
-			"blobPathBeginsWith": "/practice/blobs/input/VideoNo27_Daily_or_Hourly_Files/",
+			"blobPathBeginsWith": "/practice/blobs/input/VideoNo27_Daily_or_Hourly_Files",
 			"blobPathEndsWith": ".csv",
 			"ignoreEmptyBlobs": true,
 			"scope": "/subscriptions/1101ab50-b9a6-4719-afe5-7586e598ea9f/resourceGroups/synapse-course-rg/providers/Microsoft.Storage/storageAccounts/azuresynapsecoursedl",
