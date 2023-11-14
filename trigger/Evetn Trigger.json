@@ -2,23 +2,28 @@
 	"name": "Evetn Trigger",
 	"properties": {
 		"annotations": [],
-		"runtimeState": "Stopped",
+		"runtimeState": "Started",
 		"pipelines": [
 			{
 				"pipelineReference": {
 					"referenceName": "PL_11_Event_Based_Trigger",
 					"type": "PipelineReference"
+				}
+			},
+			{
+				"pipelineReference": {
+					"referenceName": "PL_27_Variables",
+					"type": "PipelineReference"
 				},
 				"parameters": {
-					"sourcePath": "@triggerBody().folderPath",
-					"sourceFileName": "@triggerBody().fileName"
+					"parFileName": "@trigger().outputs.body.fileName"
 				}
 			}
 		],
 		"type": "BlobEventsTrigger",
 		"typeProperties": {
-			"blobPathBeginsWith": "/practice/blobs/input / S_11_Event_Based_Trigger/",
-			"blobPathEndsWith": ".txt",
+			"blobPathBeginsWith": "/practice/blobs/input/VideoNo27_Daily_or_Hourly_Files/",
+			"blobPathEndsWith": ".csv",
 			"ignoreEmptyBlobs": true,
 			"scope": "/subscriptions/1101ab50-b9a6-4719-afe5-7586e598ea9f/resourceGroups/synapse-course-rg/providers/Microsoft.Storage/storageAccounts/azuresynapsecoursedl",
 			"events": [
