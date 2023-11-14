@@ -1,0 +1,36 @@
+{
+	"name": "PL_26_Delete_Activity",
+	"properties": {
+		"activities": [
+			{
+				"name": "Delete a File From Blob Storage",
+				"type": "Delete",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "ds_26_BlobFiles",
+						"type": "DatasetReference"
+					},
+					"enableLogging": false,
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"fileListPath": "practice/output/ListofFilestobeDeleted_26.txt",
+						"enablePartitionDiscovery": false
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "ADF_Practice_2"
+		},
+		"annotations": []
+	}
+}
