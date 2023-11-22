@@ -1,0 +1,133 @@
+{
+	"name": "PL_32_FilterActivity_2",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get All File Names",
+				"type": "GetMetadata",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "ds_28_input_files",
+						"type": "DatasetReference"
+					},
+					"fieldList": [
+						"childItems",
+						"exists"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
+					}
+				}
+			},
+			{
+				"name": "Filter CSV Files using INDEX Function",
+				"type": "Filter",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [
+					{
+						"activity": "Get All File Names",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get All File Names').output.childItems",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@greater(indexof(item().name,'.csv'),0)",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Filter CSV Files using SPLIT Function",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "Get All File Names",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get All File Names').output.childItems",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@if(not(equals(item().type, 'Folder')),equals(split(item().name, '.')[1],'csv'),bool(0) )",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "ForEach CSV File",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Filter CSV Files using SPLIT Function",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Filter CSV Files using SPLIT Function').output.Value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Set File Name",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "varFileName",
+								"value": {
+									"value": "@item().name",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"varFileName": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "ADF_Practice_2"
+		},
+		"annotations": []
+	}
+}
