@@ -1,0 +1,67 @@
+{
+	"name": "PL_33_ForEach_Activity",
+	"properties": {
+		"activities": [
+			{
+				"name": "Generate Number 1 to 10",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "varIterList",
+					"value": {
+						"value": "@range(1,10)",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "ForEach Number",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Generate Number 1 to 10",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@variables('varIterList')",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Wait For Variable Seconds",
+							"type": "Wait",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": {
+									"value": "@item()",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"varIterList": {
+				"type": "Array"
+			}
+		},
+		"folder": {
+			"name": "ADF_Practice_2"
+		},
+		"annotations": []
+	}
+}
