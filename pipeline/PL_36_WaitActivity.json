@@ -1,0 +1,20 @@
+{
+	"name": "PL_36_WaitActivity",
+	"properties": {
+		"activities": [
+			{
+				"name": "Wait For 5 Seconds",
+				"type": "Wait",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 5
+				}
+			}
+		],
+		"folder": {
+			"name": "ADF_Practice_2"
+		},
+		"annotations": []
+	}
+}
