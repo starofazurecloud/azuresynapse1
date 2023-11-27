@@ -1,0 +1,59 @@
+{
+	"name": "ds_34_input_folder_file",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_azuresynapsecoursedl",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"parFolderName": {
+				"type": "string"
+			},
+			"parFileName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().parFileName",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().parFolderName",
+					"type": "Expression"
+				},
+				"fileSystem": "practice"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "empid",
+				"type": "String"
+			},
+			{
+				"name": "empname",
+				"type": "String"
+			},
+			{
+				"name": "gender",
+				"type": "String"
+			},
+			{
+				"name": "country",
+				"type": "String"
+			},
+			{
+				"name": "salary",
+				"type": "String"
+			}
+		]
+	}
+}
