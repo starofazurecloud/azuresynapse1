@@ -1,20 +1,16 @@
 {
-	"name": "ds_practice_folder_file",
+	"name": "ds_Practice_Folder",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_azuresynapsecoursedl",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"pContainer": {
+			"parContainer": {
 				"type": "string"
 			},
-			"pFolderName": {
+			"parFolder": {
 				"type": "string"
-			},
-			"pFileName": {
-				"type": "string",
-				"defaultValue": "sample"
 			}
 		},
 		"annotations": [],
@@ -22,16 +18,12 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": {
-					"value": "@dataset().pFileName",
-					"type": "Expression"
-				},
 				"folderPath": {
-					"value": "@dataset().pFolderName",
+					"value": "@dataset().parFolder",
 					"type": "Expression"
 				},
 				"fileSystem": {
-					"value": "@dataset().pContainer",
+					"value": "@dataset().parContainer",
 					"type": "Expression"
 				}
 			},
