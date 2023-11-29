@@ -3,66 +3,52 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Until1",
-				"type": "Until",
+				"name": "Execute Pipeline1",
+				"type": "ExecutePipeline",
 				"dependsOn": [],
 				"userProperties": [],
 				"typeProperties": {
-					"expression": {
-						"value": "@equals(min(variables('varFileList')),1)",
-						"type": "Expression"
+					"pipeline": {
+						"referenceName": "PL_37_ChildPL_Get_FileList_Status",
+						"type": "PipelineReference"
 					},
-					"activities": [
+					"waitOnCompletion": true,
+					"parameters": {
+						"varFiles": {
+							"value": "@variables('varFileList')",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Execute Pipeline1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "pipelineReturnValue",
+					"value": [
 						{
-							"name": "Execute Pipeline1",
-							"type": "ExecutePipeline",
-							"dependsOn": [],
-							"userProperties": [],
-							"typeProperties": {
-								"pipeline": {
-									"referenceName": "PL_37_ChildPL_Get_FileList_Status",
-									"type": "PipelineReference"
-								},
-								"waitOnCompletion": true,
-								"parameters": {
-									"varFiles": {
-										"value": "@variables('varFileList')",
-										"type": "Expression"
-									}
-								}
-							}
-						},
-						{
-							"name": "Set variable1",
-							"type": "SetVariable",
-							"dependsOn": [
-								{
-									"activity": "Execute Pipeline1",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "pipelineReturnValue",
-								"value": [
-									{
-										"key": "varAllFileStatus",
-										"value": {
-											"type": "Expression"
-										}
-									}
-								],
-								"setSystemVariable": true
+							"key": "varAllFileStatus",
+							"value": {
+								"type": "Expression",
+								"content": "@activity('Execute Pipeline1').output.pipelineReturnValue.varChildFileStatus"
 							}
 						}
 					],
-					"timeout": "0.12:00:00"
+					"setSystemVariable": true
 				}
 			}
 		],
