@@ -77,7 +77,12 @@
 		],
 		"parameters": {
 			"varFiles": {
-				"type": "array"
+				"type": "array",
+				"defaultValue": [
+					"Employee1.csv",
+					"Employee2.csv",
+					"Employee5.csv"
+				]
 			}
 		},
 		"variables": {
