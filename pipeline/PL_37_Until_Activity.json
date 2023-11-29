@@ -1,0 +1,61 @@
+{
+	"name": "PL_37_Until_Activity",
+	"properties": {
+		"activities": [
+			{
+				"name": "Until File Gets Available",
+				"type": "Until",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@activity('Get Metadata1_copy1').output.exists",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Get Metadata1_copy1",
+							"type": "GetMetadata",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "ds_practice_folder_file",
+									"type": "DatasetReference",
+									"parameters": {
+										"pContainer": "practice",
+										"pFolderName": "input",
+										"pFileName": "Employee3.csv"
+									}
+								},
+								"fieldList": [
+									"exists",
+									"size"
+								],
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							}
+						}
+					],
+					"timeout": "0.12:00:00"
+				}
+			}
+		],
+		"folder": {
+			"name": "ADF_Practice_2"
+		},
+		"annotations": []
+	}
+}

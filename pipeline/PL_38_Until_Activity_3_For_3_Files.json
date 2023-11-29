@@ -1,0 +1,88 @@
+{
+	"name": "PL_38_Until_Activity_3_For_3_Files",
+	"properties": {
+		"activities": [
+			{
+				"name": "Until1",
+				"type": "Until",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(min(variables('varFileList')),1)",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Execute Pipeline1",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "PL_37_ChildPL_Get_FileList_Status",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"varFiles": {
+										"value": "@variables('varFileList')",
+										"type": "Expression"
+									}
+								}
+							}
+						},
+						{
+							"name": "Set variable1",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Execute Pipeline1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "pipelineReturnValue",
+								"value": [
+									{
+										"key": "varAllFileStatus",
+										"value": {
+											"type": "Expression"
+										}
+									}
+								],
+								"setSystemVariable": true
+							}
+						}
+					],
+					"timeout": "0.12:00:00"
+				}
+			}
+		],
+		"variables": {
+			"varFileList": {
+				"type": "Array",
+				"defaultValue": [
+					"Employee1.csv",
+					"Employee2.csv",
+					"Employee5.csv"
+				]
+			},
+			"varAllFilesStatus": {
+				"type": "Array",
+				"defaultValue": []
+			}
+		},
+		"folder": {
+			"name": "ADF_Practice_2"
+		},
+		"annotations": []
+	}
+}
