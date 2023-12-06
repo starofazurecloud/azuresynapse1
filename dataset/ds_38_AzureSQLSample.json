@@ -1,0 +1,40 @@
+{
+	"name": "ds_38_AzureSQLSample",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_ADF_DEMO_SQL_SVR",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "TransactionType",
+				"type": "varchar"
+			},
+			{
+				"name": "City",
+				"type": "varchar"
+			},
+			{
+				"name": "Amount",
+				"type": "decimal",
+				"precision": 30,
+				"scale": 2
+			},
+			{
+				"name": "PipeLineName",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "WebActivity"
+		}
+	}
+}
