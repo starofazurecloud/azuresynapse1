@@ -1,0 +1,84 @@
+{
+	"name": "PL_38_WebActivity_READ_FROM_API_Writeto_Blob",
+	"properties": {
+		"activities": [
+			{
+				"name": "Web dummyDOTrestapiexampleDOTcom",
+				"description": "Send Dummy Values to API",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://dummy.restapiexample.com/api/v1/employees",
+					"connectVia": {
+						"referenceName": "AutoResolveIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET",
+					"headers": {
+						"Content-Type": "application/json"
+					},
+					"body": {
+						"name": "testingggg",
+						"salary": "12333",
+						"age": "23"
+					}
+				}
+			},
+			{
+				"name": "Web Write to Storage Account",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Web dummyDOTrestapiexampleDOTcom",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://azuresynapsecoursedl.blob.core.windows.net/practice/WebActivityOutput.json?sp=racwe&st=2023-12-06T04:47:52Z&se=2023-12-06T12:47:52Z&spr=https&sv=2022-11-02&sr=c&sig=EMTVpeCXcfYDJSTcz1%2FiUANVO9JXVLJ43fhGKaOqFVM%3D",
+					"connectVia": {
+						"referenceName": "AutoResolveIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "PUT",
+					"headers": {
+						"x-ms-blob-type": "BlockBlob"
+					},
+					"body": {
+						"value": "@activity('Web dummyDOTrestapiexampleDOTcom').output",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"varWebActivityOutput": {
+				"type": "String"
+			},
+			"varWebActitivyArray": {
+				"type": "Array"
+			}
+		},
+		"folder": {
+			"name": "ADF_Practice_2"
+		},
+		"annotations": []
+	}
+}

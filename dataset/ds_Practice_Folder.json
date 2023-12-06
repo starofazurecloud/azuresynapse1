@@ -28,9 +28,9 @@
 				}
 			},
 			"columnDelimiter": ",",
-			"escapeChar": "\\",
-			"firstRowAsHeader": true,
-			"quoteChar": "\""
+			"escapeChar": "",
+			"firstRowAsHeader": false,
+			"quoteChar": ""
 		},
 		"schema": [
 			{
