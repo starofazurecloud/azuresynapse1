@@ -2,6 +2,177 @@
 	"name": "PL_40_Switch_Activity",
 	"properties": {
 		"description": "Requirement:\n\nPipeline should take file from Source Location and copy it to output1/output2 folders based on Pipeline Parameter Value.",
+		"activities": [
+			{
+				"name": "Switch1",
+				"type": "Switch",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"on": {
+						"value": "@string(pipeline().parameters.parPLTarget)",
+						"type": "Expression"
+					},
+					"cases": [
+						{
+							"value": "txt",
+							"activities": [
+								{
+									"name": "TXT Case Copy data to output1 fodler",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true,
+												"enablePartitionDiscovery": false
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "ds_practice_folder_file",
+											"type": "DatasetReference",
+											"parameters": {
+												"pContainer": "practice",
+												"pFolderName": "input",
+												"pFileName": "EmployeeNew.txt"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "ds_Practice_Folder",
+											"type": "DatasetReference",
+											"parameters": {
+												"parContainer": "practice",
+												"parFolder": {
+													"value": "output/@{formatDateTime(utcnow(),'yyyy-MM-dd')}/1",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						},
+						{
+							"value": "csv",
+							"activities": [
+								{
+									"name": "CSV Case Copy data to output1 fodler_copy1",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true,
+												"enablePartitionDiscovery": false
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "ds_practice_folder_file",
+											"type": "DatasetReference",
+											"parameters": {
+												"pContainer": "practice",
+												"pFolderName": "input",
+												"pFileName": "EmployeeNew.txt"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "ds_Practice_Folder",
+											"type": "DatasetReference",
+											"parameters": {
+												"parContainer": "practice",
+												"parFolder": {
+													"value": "output/@{formatDateTime(utcnow(),'yyyy-MM-dd')}/2",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"parPLTarget": {
+				"type": "string"
+			}
+		},
 		"folder": {
 			"name": "ADF_Practice_2"
 		},
