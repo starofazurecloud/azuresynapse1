@@ -1,7 +1,7 @@
 {
 	"name": "PL_42_Lookup_Activtiy",
 	"properties": {
-		"description": "Requirement:\n\nServer : adf-demo-svr\nDB : adf-demo\n\nTable: tblFilesConfig\n\nID   SourceFile         TargetFolder\n---------------------------------------------\n1   Employee1.csv     20231210/Output1\n2   Employee2.csv     20231210/Output2\n3   Employee3.csv     20231210/Output3\n4   EmployeeFileForSCD2.csv     20231210/Output4\n\nCopy above files from source location to mentioned target locations\n",
+		"description": "Requirement:\n\nServer : adf-demo-svr\nDB : adf-demo\n\nTable: tblFilesConfig\n\nID   SourceFile         TargetFolder\n---------------------------------------------\n1   Employee1.csv     20231210/Output1\n2   Employee2.csv     20231210/Output2\n3   Employee3.csv     20231210/Output3\n4   EmployeeFileForSCD2.csv     20231210/Output4\n\nCopy above files from source location to mentioned target locations\n\nand writeback the status of copy activity to the table (update)\n",
 		"activities": [
 			{
 				"name": "Lookup Get All the Data",
