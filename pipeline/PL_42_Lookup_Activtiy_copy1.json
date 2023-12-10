@@ -1,0 +1,162 @@
+{
+	"name": "PL_42_Lookup_Activtiy_copy1",
+	"properties": {
+		"description": "Requirement:\n\nServer : adf-demo-svr\nDB : adf-demo\n\nTable: tblFilesConfig\n\nID   SourceFile         TargetFolder\n---------------------------------------------\n1   Employee1.csv     20231210/Output1\n2   Employee2.csv     20231210/Output2\n3   Employee3.csv     20231210/Output3\n4   EmployeeFileForSCD2.csv     20231210/Output4\n\nCopy above files from source location to mentioned target locations\n",
+		"activities": [
+			{
+				"name": "Lookup Get All the Data",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"isolationLevel": "ReadUncommitted",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_ADF_DEMO_SQL_SERVER",
+						"type": "DatasetReference",
+						"parameters": {
+							"parTableName": "tblFilesConfig"
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"additionalColumns": [
+							{
+								"name": "Details",
+								"value": {
+									"value": "@variables('varFileNamesandTargetLocation')",
+									"type": "Expression"
+								}
+							}
+						],
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "Details",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Column2",
+									"type": "String",
+									"physicalType": "String"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_dummy_sample",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_practice_folder_file",
+						"type": "DatasetReference",
+						"parameters": {
+							"pContainer": "practice",
+							"pFolderName": "output",
+							"pFileName": "configfile.csv"
+						}
+					}
+				]
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Lookup Get All the Data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "varFileNamesandTargetLocation",
+					"value": {
+						"value": "@replace(replace(join(activity('Lookup Get All the Data').output.value,'\\n'),'{',''),'}','')",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"varFileNamesandTargetLocation": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "ADF_Practice_2"
+		},
+		"annotations": []
+	}
+}
