@@ -113,11 +113,55 @@
 									}
 								}
 							]
+						},
+						{
+							"name": "Lookup Activity to update the completion details",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "Copy data1",
+									"dependencyConditions": [
+										"Succeeded",
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "update dbo.tblFilesConfig SET CopyStatus='@{activity('Copy data1').output.executionDetails[0].status}',ModifiedTime='@{formatDateTime(utcnow(),'yyyy-MM-dd hh:MM:ss')}' WHERE ID = @{item().ID}\n\nSELECT 1 AS ID",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_ADF_DEMO_SQL_SERVER",
+									"type": "DatasetReference",
+									"parameters": {
+										"parTableName": "tblFilesConfig"
+									}
+								}
+							}
 						}
 					]
 				}
 			}
 		],
+		"variables": {
+			"varFileNamesandTargetLocation": {
+				"type": "String"
+			}
+		},
 		"folder": {
 			"name": "ADF_Practice_2"
 		},
