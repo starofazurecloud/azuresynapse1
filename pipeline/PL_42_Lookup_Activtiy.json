@@ -1,9 +1,10 @@
 {
 	"name": "PL_42_Lookup_Activtiy",
 	"properties": {
+		"description": "Requirement:\n\nServer : adf-demo-svr\nDB : adf-demo\n\nTable: tblFilesConfig\n\nID   SourceFile         TargetFolder\n---------------------------------------------\n1   Employee1.csv     20231210/Output1\n2   Employee2.csv     20231210/Output2\n3   Employee3.csv     20231210/Output3\n4   EmployeeFileForSCD2.csv     20231210/Output4\n\nCopy above files from source location to mentioned target locations\n",
 		"activities": [
 			{
-				"name": "Lookup1",
+				"name": "Lookup Get All the Data",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -16,26 +17,104 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "DelimitedTextSource",
-						"storeSettings": {
-							"type": "AzureBlobFSReadSettings",
-							"recursive": true,
-							"enablePartitionDiscovery": false
-						},
-						"formatSettings": {
-							"type": "DelimitedTextReadSettings"
-						}
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"isolationLevel": "ReadUncommitted",
+						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "ds_practice_folder_file",
+						"referenceName": "ds_ADF_DEMO_SQL_SERVER",
 						"type": "DatasetReference",
 						"parameters": {
-							"pContainer": "practice",
-							"pFolderName": "input/VideoNo27_Daily_or_Hourly_Files",
-							"pFileName": "DailySales.csv"
+							"parTableName": "tblFilesConfig"
 						}
 					},
 					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup Get All the Data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup Get All the Data').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "BinarySource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true
+									},
+									"formatSettings": {
+										"type": "BinaryReadSettings"
+									}
+								},
+								"sink": {
+									"type": "BinarySink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_Practice_Folder_File_Binary",
+									"type": "DatasetReference",
+									"parameters": {
+										"parDSContainerName": "practice",
+										"parDSFolderName": "input",
+										"parDSFileName": {
+											"value": "@item().SourceFile",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_Practice_Folder_File_Binary",
+									"type": "DatasetReference",
+									"parameters": {
+										"parDSContainerName": "practice",
+										"parDSFolderName": {
+											"value": "output/@{item().TargetFolder}",
+											"type": "Expression"
+										},
+										"parDSFileName": {
+											"value": "@item().SourceFile",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
 				}
 			}
 		],
