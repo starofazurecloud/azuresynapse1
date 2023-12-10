@@ -1,0 +1,39 @@
+{
+	"name": "ds_Practice_Folder_File_Binary",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_azuresynapsecoursedl",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"parDSContainerName": {
+				"type": "string"
+			},
+			"parDSFolderName": {
+				"type": "string"
+			},
+			"parDSFileName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().parDSFileName",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().parDSFolderName",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().parDSContainerName",
+					"type": "Expression"
+				}
+			}
+		}
+	}
+}
