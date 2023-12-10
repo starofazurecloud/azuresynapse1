@@ -1,6 +1,7 @@
 {
 	"name": "PL_40_Switch_Activity",
 	"properties": {
+		"description": "Requirement:\n\nPipeline should take file from Source Location and copy it to output1/output2 folders based on Pipeline Parameter Value.",
 		"folder": {
 			"name": "ADF_Practice_2"
 		},
