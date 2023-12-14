@@ -1,0 +1,294 @@
+{
+	"name": "PL_44_StoresProcedure_Activity",
+	"properties": {
+		"description": "Requirement:\n+++++++++++++++++++++++\n\n1 . Create a Stored Procedure to Mark Start of Pipeline Execution\n\n2 . Execute some Tasks\n\n3. Mark the Completion ( Success or Failure ) Status for same Runid\n\n\n\n\n",
+		"activities": [
+			{
+				"name": "Stored procedure Insert",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[sp_logPipelineExecutionDetails]",
+					"storedProcedureParameters": {
+						"DataFactoryName": {
+							"value": {
+								"value": "@pipeline().DataFactory",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"ExecutionID": {
+							"value": null,
+							"type": "Int64"
+						},
+						"operation": {
+							"value": {
+								"value": "@string('I')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"PipelieRunStatus": {
+							"value": {
+								"value": "@string('STARTED')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"PipelineName": {
+							"value": {
+								"value": "@pipeline().Pipeline",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"PipelineRunID": {
+							"value": {
+								"value": "@pipeline().RunId",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"PipelineTriggerName": {
+							"value": {
+								"value": "@pipeline().TriggerName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"PipelineTriggerTime": {
+							"value": {
+								"value": "@utcNow()",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_ADF_DEMO_SQL_SVR",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Stored procedure Update",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Lookup1",
+						"dependencyConditions": [
+							"Succeeded",
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[sp_logPipelineExecutionDetails]",
+					"storedProcedureParameters": {
+						"DataFactoryName": {
+							"value": null,
+							"type": "String"
+						},
+						"ExecutionID": {
+							"value": {
+								"value": "@variables('Set Execution ID')",
+								"type": "Expression"
+							},
+							"type": "Int64"
+						},
+						"operation": {
+							"value": {
+								"value": "@string('U')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"PipelieRunStatus": {
+							"value": {
+								"value": "@activity('Lookup1').Status",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"PipelineName": {
+							"value": null,
+							"type": "String"
+						},
+						"PipelineRunID": {
+							"value": null,
+							"type": "String"
+						},
+						"PipelineTriggerName": {
+							"value": null,
+							"type": "String"
+						},
+						"PipelineTriggerTime": {
+							"value": null,
+							"type": "DateTime"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_ADF_DEMO_SQL_SVR",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Set Exection ID",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Lookup to Get ExecutionID",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Set Execution ID",
+					"value": {
+						"value": "@activity('Lookup to Get ExecutionID').output.firstRow.ExecutionID",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Lookup to Get ExecutionID",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "Stored procedure Insert",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT * FROM tbl_PipelineExecutionDetails where PipelineRunID =  '@{pipeline().RunId}'",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_ADF_DEMO_SQL_SERVER",
+						"type": "DatasetReference",
+						"parameters": {
+							"parTableName": "tbl_PipelineExecutionDetails"
+						}
+					}
+				}
+			},
+			{
+				"name": "Lookup1",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "Set Exection ID",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"dataset": {
+						"referenceName": "ds_practice_folder_file",
+						"type": "DatasetReference",
+						"parameters": {
+							"pContainer": "nocontainer",
+							"pFolderName": "nofolder",
+							"pFileName": "sample"
+						}
+					}
+				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Lookup1",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "lookupOutPut",
+					"value": {
+						"value": "@{activity('Lookup1')?.Error?.message}",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"Set Execution ID": {
+				"type": "Integer"
+			},
+			"lookupOutPut": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "ADF_Practice_2"
+		},
+		"annotations": []
+	}
+}
