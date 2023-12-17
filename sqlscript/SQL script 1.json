@@ -2,7 +2,7 @@
 	"name": "SQL script 1",
 	"properties": {
 		"content": {
-			"query": "\n\nselect * from sys.dm_external_data_processed\n\n\nselect * from sys.configurations where name like '%Data Pro%'\n\n\n EXEC sp_set_data_processed_limit @type= N'monthly', @limit_tb = 1 ;\n\n EXEC  sp_set_data_processed_limit @type= N'Weekly', @limit_tb = 1 ;\n\n  EXEC  sp_set_data_processed_limit @type= N'Daily', @limit_tb = 1 ;",
+			"query": "\n\nselect * from sys.dm_external_data_processed\n\n\nselect * from sys.configurations where name like '%Data Pro%'\n\n\n EXEC sp_set_data_processed_limit @type= N'monthly', @limit_tb = 1 ;\n\n EXEC  sp_set_data_processed_limit @type= N'Weekly', @limit_tb = 1 ;\n\n  EXEC  sp_set_data_processed_limit @type= N'Daily', @limit_tb = 1 ;\n\n  select * from sys.dm_external_data_processed\n\n\n  select * from sys.objects",
 			"metadata": {
 				"language": "sql"
 			},
