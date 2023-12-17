@@ -1,0 +1,17 @@
+{
+	"name": "SQL JSON",
+	"properties": {
+		"content": {
+			"query": "\nSELECT\n    *,JSON_VALUE(jsonDoc,'$.payment_type')\n    ,JSON_VALUE(jsonDoc,'$.payment_type_desc')\nFROM\n    OPENROWSET(\n        BULK 'payment_type.json',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '1.0',\n        FIELDTERMINATOR = '0x0b',\n        ROWTERMINATOR = '0x0a',\n        FIELDQUOTE='0x0b'\n    )WITH(jsonDoc NVARCHAR(MAX)) AS [result]\n\n--payment_type_array.json\n\nSELECT\n    *\n    ,JSON_VALUE(jsonDoc,'$.payment_type_desc[0].sub_type')\n    ,JSON_VALUE(jsonDoc,'$.payment_type_desc[0].value')\nFROM\n    OPENROWSET(\n        BULK 'payment_type_array.json',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '1.0',\n        FIELDTERMINATOR = '0x0b',\n        ROWTERMINATOR = '0x0a',\n        FIELDQUOTE='0x0b'\n    )WITH(jsonDoc NVARCHAR(MAX))     \n    AS [result]\n\n\n\nSELECT\n    *\n    \nFROM\n    OPENROWSET(\n        BULK 'payment_type_array.json',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '1.0',\n        FIELDTERMINATOR = '0x0b',\n        ROWTERMINATOR = '0x0a',\n        FIELDQUOTE='0x0b'\n    )WITH(jsonDoc NVARCHAR(MAX))  AS result\n    OUTER APPLY OPENJSON(jsonDoc)  \n    WITH (payment_type INT,payment_type_desc NVARCHAR(MAX) AS JSON    )\n    OUTER APPLY OPENJSON(payment_type_desc)  \n    WITH (sub_type INT,payment_type_desc_value NVARCHAR(30) '$.value'  )\n\n    \n\n\n\nSELECT\n    *\n    \nFROM\n    OPENROWSET(\n        BULK 'rate_code.json',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '1.0',\n        FIELDTERMINATOR = '0x0b',\n        ROWTERMINATOR = '0x0b',\n        FIELDQUOTE='0x0b'\n    )WITH(jsonDoc NVARCHAR(MAX))  AS result\n    OUTER APPLY OPENJSON(jsonDoc)  \n    WITH (rate_code_id INT,rate_code NVARCHAR(30)  )\n\nSELECT\n    *\nFROM\n    OPENROWSET(\n        BULK 'rate_code_multi_line.json',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '1.0',\n        FIELDTERMINATOR = '0x0b',\n        ROWTERMINATOR = '0x0b',\n        FIELDQUOTE='0x0b'\n    )WITH(jsonDoc NVARCHAR(MAX))  AS result\n    OUTER APPLY OPENJSON(jsonDoc)  \n    WITH (rate_code_id INT '$.rate_code_id'\n            ,rate_code NVARCHAR(30)  '$.rate_code' )\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_discovery",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
