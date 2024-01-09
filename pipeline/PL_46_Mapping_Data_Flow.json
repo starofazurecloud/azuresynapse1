@@ -1,0 +1,36 @@
+{
+	"name": "PL_46_Mapping_Data_Flow",
+	"properties": {
+		"description": "Output :\n\nempid,name,country,depname\n",
+		"activities": [
+			{
+				"name": "DataFlow_Join_Emp_and_Department",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "DF_46_Join_EMP_Department",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "ADF_Practice_2"
+		},
+		"annotations": []
+	}
+}

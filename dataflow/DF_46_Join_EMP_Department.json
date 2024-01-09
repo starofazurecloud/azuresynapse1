@@ -1,0 +1,118 @@
+{
+	"name": "DF_46_Join_EMP_Department",
+	"properties": {
+		"folder": {
+			"name": "Practice_2"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "empSource"
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "department"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_ADF_DEMO_SQL_SVR",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinktoDB"
+				}
+			],
+			"transformations": [
+				{
+					"name": "lookupDepartmentName"
+				},
+				{
+					"name": "selectRequiredColumns"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          emid as short,",
+				"          name as string,",
+				"          country as string,",
+				"          department as short",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'practice',",
+				"     folderPath: 'input/VideoNo46_Mapping_Data_Flows',",
+				"     fileName: 'employee.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> empSource",
+				"source(output(",
+				"          depid as short,",
+				"          depname as string",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'practice',",
+				"     folderPath: 'input/VideoNo46_Mapping_Data_Flows',",
+				"     fileName: 'department.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> department",
+				"empSource, department lookup(department == depid,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookupDepartmentName",
+				"lookupDepartmentName select(mapColumn(",
+				"          emid,",
+				"          name,",
+				"          country,",
+				"          depname",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectRequiredColumns",
+				"selectRequiredColumns sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          id as integer,",
+				"          empid as integer,",
+				"          ename as string,",
+				"          country as string,",
+				"          departmentname as string",
+				"     ),",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'emp46',",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          empid = emid,",
+				"          ename = name,",
+				"          country,",
+				"          departmentname = depname",
+				"     )) ~> sinktoDB"
+			]
+		}
+	}
+}
