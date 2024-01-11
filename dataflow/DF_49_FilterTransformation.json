@@ -1,0 +1,117 @@
+{
+	"name": "DF_49_FilterTransformation",
+	"properties": {
+		"folder": {
+			"name": "Practice_2"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "Employee"
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "Department"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_ADF_DEMO_SQL_SVR",
+						"type": "LinkedServiceReference"
+					},
+					"name": "SavetoDB"
+				}
+			],
+			"transformations": [
+				{
+					"name": "lookupToDepartment"
+				},
+				{
+					"name": "filterNonPayrollDepartment"
+				},
+				{
+					"name": "selectRequiredColumns"
+				},
+				{
+					"name": "AddCurrentDate"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          emid as short,",
+				"          name as string,",
+				"          country as string,",
+				"          department as short",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'practice',",
+				"     folderPath: 'input/VideoNo46_Mapping_Data_Flows',",
+				"     fileName: 'employee.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> Employee",
+				"source(output(",
+				"          depid as short,",
+				"          depname as string",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'practice',",
+				"     folderPath: 'input/VideoNo46_Mapping_Data_Flows',",
+				"     fileName: 'department.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> Department",
+				"Employee, Department lookup(department == depid,",
+				"     multiple: true,",
+				"     broadcast: 'auto')~> lookupToDepartment",
+				"lookupToDepartment filter(upper(depname)==upper(\"payroll\")) ~> filterNonPayrollDepartment",
+				"AddCurrentDate select(mapColumn(",
+				"          each(match(name==\"name\"),",
+				"               \"e\"+$$ = $$),",
+				"          each(match(name==\"emid\"),",
+				"               \"empid\" = $$),",
+				"          each(match(name==\"depname\"),",
+				"               \"departmentname\" = $$),",
+				"          each(match(name==\"country\")),",
+				"          createdon",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: false) ~> selectRequiredColumns",
+				"filterNonPayrollDepartment derive(createdon = currentTimestamp()) ~> AddCurrentDate",
+				"selectRequiredColumns sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'emp49',",
+				"     preSQLs:['/*DELETE FROM dbo.emp49*/'],",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> SavetoDB"
+			]
+		}
+	}
+}
