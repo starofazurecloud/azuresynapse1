@@ -1,0 +1,110 @@
+{
+	"name": "DF_50_Aggregate_Transformation",
+	"properties": {
+		"folder": {
+			"name": "Practice_2"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "Employee"
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "department"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "writetoOutputFile"
+				}
+			],
+			"transformations": [
+				{
+					"name": "joinWithDepartment"
+				},
+				{
+					"name": "aggregateyDepartmentName"
+				},
+				{
+					"name": "RenameColumns"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          emid as short,",
+				"          name as string,",
+				"          country as string,",
+				"          department as short",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'practice',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     wildcardPaths:['input/VideoNo46_Mapping_Data_Flows/employee*.csv']) ~> Employee",
+				"source(output(",
+				"          depid as short,",
+				"          depname as string",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'practice',",
+				"     folderPath: 'input/VideoNo46_Mapping_Data_Flows',",
+				"     fileName: 'department.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> department",
+				"Employee, department join(department == depid,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinWithDepartment",
+				"joinWithDepartment aggregate(groupBy(depname),",
+				"     TotalEmployee = sum(1)) ~> aggregateyDepartmentName",
+				"aggregateyDepartmentName select(mapColumn(",
+				"          each(match(name==\"depname\"),",
+				"               \"DepartmentName\" = $$),",
+				"          each(match(name ==\"TotalEmployee\"),",
+				"               \"EmployeeCount\" = $$)",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> RenameColumns",
+				"RenameColumns sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'json',",
+				"     fileSystem: 'practice',",
+				"     folderPath: (\"output/\"+toString(currentDate(),\"yyyy-MM-dd\")),",
+				"     truncate: true,",
+				"     partitionFileNames:['EmployeeCountByDepartment.json'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> writetoOutputFile"
+			]
+		}
+	}
+}
