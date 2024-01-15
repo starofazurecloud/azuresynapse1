@@ -1,0 +1,149 @@
+{
+	"name": "DF_52_ConditionalSplit_Transformation",
+	"properties": {
+		"folder": {
+			"name": "Practice_2"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "Employee"
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "Department"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinkPayroll"
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinkIT"
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinkHR"
+				}
+			],
+			"transformations": [
+				{
+					"name": "joinbyDepartmentID"
+				},
+				{
+					"name": "ConditionalSplit"
+				},
+				{
+					"name": "selectColumns"
+				}
+			],
+			"scriptLines": [
+				"source(useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'practice',",
+				"     folderPath: 'input/VideoNo46_Mapping_Data_Flows',",
+				"     fileName: 'employee50.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> Employee",
+				"source(useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'practice',",
+				"     folderPath: 'input/VideoNo46_Mapping_Data_Flows',",
+				"     fileName: 'department.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> Department",
+				"Employee, Department join(toString(byName(\"department\",\"Employee\")) == toString(byName(\"depid\",\"Department\")),",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinbyDepartmentID",
+				"selectColumns split(toString(byName(\"department\"))==\"payroll\",",
+				"     toString(byName(\"department\"))==\"HR\",",
+				"     toString(byName(\"department\"))==\"IT\",",
+				"     disjoint: false) ~> ConditionalSplit@(Payroll, HR, IT, Others)",
+				"joinbyDepartmentID select(mapColumn(",
+				"          each(match(name ==\"emid\"),",
+				"               \"employeeId\" = $$),",
+				"          each(match(name==\"name\"),",
+				"               \"employeeName\" = $$),",
+				"          each(match(name==\"country\")),",
+				"          each(match(name==\"depname\"),",
+				"               \"department\" = $$)",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> selectColumns",
+				"ConditionalSplit@Payroll sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'practice',",
+				"     folderPath: (\"output/\"+toString(currentDate(),\"yyyy-MM-dd\")+\"/payroll\"),",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkPayroll",
+				"ConditionalSplit@IT sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'practice',",
+				"     folderPath: (\"output/\"+toString(currentDate(),\"yyyy-MM-dd\")+\"/IT\"),",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkIT",
+				"ConditionalSplit@HR sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'practice',",
+				"     folderPath: (\"output/\"+toString(currentDate(),\"yyyy-MM-dd\")+\"/HR\"),",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkHR"
+			]
+		}
+	}
+}
