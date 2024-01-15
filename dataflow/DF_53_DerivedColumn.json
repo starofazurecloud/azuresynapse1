@@ -1,0 +1,99 @@
+{
+	"name": "DF_53_DerivedColumn",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "Employee"
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "Department"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinktoFile"
+				}
+			],
+			"transformations": [
+				{
+					"name": "lookupDepartmentName"
+				},
+				{
+					"name": "selectColumns"
+				},
+				{
+					"name": "deriveMissingCountry"
+				}
+			],
+			"scriptLines": [
+				"source(useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'practice',",
+				"     folderPath: 'input/VideoNo46_Mapping_Data_Flows',",
+				"     fileName: 'EmployeeWithoutCountry.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> Employee",
+				"source(useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'practice',",
+				"     folderPath: 'input/VideoNo46_Mapping_Data_Flows',",
+				"     fileName: 'department.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> Department",
+				"Employee, Department lookup(toString(byName(\"department\")) == toString(byName(\"depid\")),",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookupDepartmentName",
+				"lookupDepartmentName select(mapColumn(",
+				"          each(match(name==\"empid\")),",
+				"          each(match(name==\"name\"),",
+				"               \"empname\" = $$),",
+				"          each(match(name==\"country\")),",
+				"          each(match(name ==\"depname\"),",
+				"               \"departmentName\" = $$)",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: false) ~> selectColumns",
+				"selectColumns derive(country = iifNull(toString(byName(\"country\")),\"INDIA\")) ~> deriveMissingCountry",
+				"deriveMissingCountry sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'practice',",
+				"     folderPath: (\"output/\"+toString(currentDate(),\"yyyy-MM-dd\")+\"/53/\"),",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinktoFile"
+			]
+		}
+	}
+}

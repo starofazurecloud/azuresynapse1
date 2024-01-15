@@ -1,6 +1,7 @@
 {
 	"name": "DF_52_ConditionalSplit_Transformation",
 	"properties": {
+		"description": "To differentiate ebtween FirstMatchig and All Matching Option in Conditional Split Transformation , check this link\n\nhttps://www.youtube.com/watch?v=Mnct6SeUebc&t=563s",
 		"folder": {
 			"name": "Practice_2"
 		},
