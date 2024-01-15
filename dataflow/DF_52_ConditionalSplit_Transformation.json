@@ -91,7 +91,7 @@
 				"     toString(byName(\"department\"))==\"IT\",",
 				"     disjoint: false) ~> ConditionalSplit@(Payroll, HR, IT, Others)",
 				"joinbyDepartmentID select(mapColumn(",
-				"          each(match(name ==\"emid\"),",
+				"          each(match(name==\"emid\"),",
 				"               \"employeeId\" = $$),",
 				"          each(match(name==\"name\"),",
 				"               \"employeeName\" = $$),",
