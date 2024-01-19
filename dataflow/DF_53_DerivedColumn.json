@@ -1,6 +1,9 @@
 {
 	"name": "DF_53_DerivedColumn",
 	"properties": {
+		"folder": {
+			"name": "Practice_2"
+		},
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [
@@ -73,7 +76,7 @@
 				"          each(match(name==\"name\"),",
 				"               \"empname\" = $$),",
 				"          each(match(name==\"country\")),",
-				"          each(match(name ==\"depname\"),",
+				"          each(match(name==\"depname\"),",
 				"               \"departmentName\" = $$)",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
