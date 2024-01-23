@@ -140,7 +140,7 @@
 				"     validateSchema: false,",
 				"     format: 'delimited',",
 				"     fileSystem: 'practice',",
-				"     folderPath: (\"output/55\"+toString(currentDate(),\"yyyy-MM-dd\")),",
+				"     folderPath: (\"output/55/\"+toString(currentDate(),\"yyyy-MM-dd\")),",
 				"     columnDelimiter: ',',",
 				"     escapeChar: '\\\\',",
 				"     quoteChar: '\\\"',",
