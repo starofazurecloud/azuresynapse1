@@ -1,0 +1,58 @@
+{
+	"name": "DF_56_Lookup_ReadFrom_Delta",
+	"properties": {
+		"folder": {
+			"name": "Practice_2"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "SourceDelta"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_ADF_DEMO_SQL_SVR",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinktoDatabase"
+				}
+			],
+			"transformations": [],
+			"scriptLines": [
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delta',",
+				"     fileSystem: 'practice',",
+				"     folderPath: 'output/56/2024-01-25/') ~> SourceDelta",
+				"SourceDelta sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'Employee56',",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          each(match(name==\"EmployeeID\")),",
+				"          each(match(name==\"EmployeeName\")),",
+				"          each(match(name==\"Country\")),",
+				"          each(match(name==\"DepartmentName\"),",
+				"               \"Department\" = $$)",
+				"     )) ~> sinktoDatabase"
+			]
+		}
+	}
+}

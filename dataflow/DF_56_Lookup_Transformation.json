@@ -75,6 +75,7 @@
 				"     format: 'delta',",
 				"     fileSystem: 'practice',",
 				"     folderPath: (\"output/56/\"+toString(currentDate(),\"yyyy-MM-dd\")),",
+				"     overwrite: true,",
 				"     mergeSchema: false,",
 				"     autoCompact: false,",
 				"     optimizedWrite: false,",
