@@ -31,6 +31,9 @@
 					"name": "selectandRenameColumns"
 				},
 				{
+					"name": "derivedColumn1"
+				},
+				{
 					"name": "outputEmployee"
 				}
 			],
@@ -54,7 +57,7 @@
 				"     format: 'delimited',",
 				"     fileSystem: 'practice',",
 				"     folderPath: 'input/VideoNo46_Mapping_Data_Flows',",
-				"     fileName: 'employee.csv',",
+				"     fileName: 'department.csv',",
 				"     columnDelimiter: ',',",
 				"     escapeChar: '\\\\',",
 				"     quoteChar: '\\\"',",
@@ -71,11 +74,12 @@
 				"          each(match(name==\"country\"),",
 				"               \"Country\" = $$),",
 				"          each(match(name==\"depname\"),",
-				"               \"DepartmentName\" = $$)",
+				"                \"DepartmentName\" = $$)",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> selectandRenameColumns",
-				"selectandRenameColumns output(mapColumn(",
+				"selectandRenameColumns derive(DepartmentName = iifNull(upper(toString(byName(\"DepartmentName\"))),\"NA\")) ~> derivedColumn1",
+				"derivedColumn1 output(mapColumn(",
 				"          each(match(name==\"EmployeeID\")),",
 				"          each(match(name==\"EmployeeName\")),",
 				"          each(match(name==\"Country\")),",
