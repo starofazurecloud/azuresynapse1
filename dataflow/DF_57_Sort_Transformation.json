@@ -21,6 +21,9 @@
 					"name": "sortByDepartment"
 				},
 				{
+					"name": "AddDateTIme"
+				},
+				{
 					"name": "EmployeeFlowLet",
 					"flowlet": {
 						"referenceName": "FlowletEmployee",
@@ -32,7 +35,8 @@
 				"compose(composition: 'FlowletEmployee') ~> EmployeeFlowLet@(outputEmployee)",
 				"EmployeeFlowLet@outputEmployee sort(asc(toString(byName(\"DepartmentName\")), true),",
 				"     caseInsensitive: true) ~> sortByDepartment",
-				"sortByDepartment sink(allowSchemaDrift: true,",
+				"sortByDepartment derive(CreatedDateTime = currentTimestamp()) ~> AddDateTIme",
+				"AddDateTIme sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'table',",
 				"     store: 'sqlserver',",
@@ -51,7 +55,8 @@
 				"          each(match(name==\"EmployeeName\")),",
 				"          each(match(name==\"Country\")),",
 				"          each(match(name==\"DepartmentName\"),",
-				"               substring($$,1,10) = $$)",
+				"               substring($$,1,10) = $$),",
+				"          each(match(name==\"CreatedDateTime\"))",
 				"     )) ~> sinkWritetoDB"
 			]
 		}
