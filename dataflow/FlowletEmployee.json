@@ -1,0 +1,87 @@
+{
+	"name": "FlowletEmployee",
+	"properties": {
+		"folder": {
+			"name": "Practice_2"
+		},
+		"type": "Flowlet",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "Employee"
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresynapsecoursedl",
+						"type": "LinkedServiceReference"
+					},
+					"name": "Department"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "selectandRenameColumns"
+				},
+				{
+					"name": "output1"
+				}
+			],
+			"scriptLines": [
+				"source(useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'practice',",
+				"     folderPath: 'input/VideoNo46_Mapping_Data_Flows',",
+				"     fileName: 'employee.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> Employee",
+				"source(useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'practice',",
+				"     folderPath: 'input/VideoNo46_Mapping_Data_Flows',",
+				"     fileName: 'employee.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> Department",
+				"Employee, Department lookup(toString(byName(\"department\")) == toString(byName(\"depid\")),",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"lookup1 select(mapColumn(",
+				"          each(match(name==\"emid\"),",
+				"               \"EmployeeID\" = $$),",
+				"          each(match(name==\"name\"),",
+				"               \"EmployeeName\" = $$),",
+				"          each(match(name==\"country\"),",
+				"               \"Country\" = $$),",
+				"          each(match(name==\"depname\"),",
+				"               \"DepartmentName\" = $$)",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> selectandRenameColumns",
+				"selectandRenameColumns output(mapColumn(",
+				"          each(match(name==\"EmployeeID\")),",
+				"          each(match(name==\"EmployeeName\")),",
+				"          each(match(name==\"Country\")),",
+				"          each(match(name==\"DepartmentName\"))",
+				"     )) ~> output1"
+			]
+		}
+	}
+}
