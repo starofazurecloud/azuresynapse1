@@ -7,10 +7,21 @@
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [],
-			"sinks": [],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_ADF_DEMO_SQL_SVR",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinkWritetoDB"
+				}
+			],
 			"transformations": [
 				{
-					"name": "compose1",
+					"name": "sortByDepartment"
+				},
+				{
+					"name": "EmployeeFlowLet",
 					"flowlet": {
 						"referenceName": "FlowletEmployee",
 						"type": "DataFlowReference"
@@ -18,7 +29,30 @@
 				}
 			],
 			"scriptLines": [
-				"compose(composition: 'FlowletEmployee') ~> compose1@(outputEmployee)"
+				"compose(composition: 'FlowletEmployee') ~> EmployeeFlowLet@(outputEmployee)",
+				"EmployeeFlowLet@outputEmployee sort(asc(toString(byName(\"DepartmentName\")), true),",
+				"     caseInsensitive: true) ~> sortByDepartment",
+				"sortByDepartment sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'Employee57',",
+				"     preSQLs:[(\"delete from \"+\"dbo.Employee57\")],",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          each(match(name==\"EmployeeID\")),",
+				"          each(match(name==\"EmployeeName\")),",
+				"          each(match(name==\"Country\")),",
+				"          each(match(name==\"DepartmentName\"),",
+				"               substring($$,1,10) = $$)",
+				"     )) ~> sinkWritetoDB"
 			]
 		}
 	}
