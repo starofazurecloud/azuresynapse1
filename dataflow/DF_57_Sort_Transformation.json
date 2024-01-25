@@ -1,0 +1,25 @@
+{
+	"name": "DF_57_Sort_Transformation",
+	"properties": {
+		"folder": {
+			"name": "Practice_2"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "compose1",
+					"flowlet": {
+						"referenceName": "FlowletEmployee",
+						"type": "DataFlowReference"
+					}
+				}
+			],
+			"scriptLines": [
+				"compose(composition: 'FlowletEmployee') ~> compose1@(outputEmployee)"
+			]
+		}
+	}
+}

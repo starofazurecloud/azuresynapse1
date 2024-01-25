@@ -31,7 +31,7 @@
 					"name": "selectandRenameColumns"
 				},
 				{
-					"name": "output1"
+					"name": "outputEmployee"
 				}
 			],
 			"scriptLines": [
@@ -73,14 +73,14 @@
 				"          each(match(name==\"depname\"),",
 				"               \"DepartmentName\" = $$)",
 				"     ),",
-				"     skipDuplicateMapInputs: false,",
-				"     skipDuplicateMapOutputs: false) ~> selectandRenameColumns",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectandRenameColumns",
 				"selectandRenameColumns output(mapColumn(",
 				"          each(match(name==\"EmployeeID\")),",
 				"          each(match(name==\"EmployeeName\")),",
 				"          each(match(name==\"Country\")),",
 				"          each(match(name==\"DepartmentName\"))",
-				"     )) ~> output1"
+				"     )) ~> outputEmployee"
 			]
 		}
 	}
